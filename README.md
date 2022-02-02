@@ -24,6 +24,16 @@ de557e3b5323   bitnami/zookeeper:latest   "/opt/bitnami/script…"   15 seconds 
 
 Then the bit you want is: ``0.0.0.0:61892->8080/tcp   my-nifi-cluster-nifi-1`` and you need port 61892.
 
+## Create Flows
+
+Once connected to the GUI you can create your flows. To get you started their is a simple stored under the templates directory. Load it from NiFi desktop.
+
+*right click* -> Upload Template -> *browse* -> "Simple_Kafka_Flow.xml" -> Upload
+
+Then add the template onto the desktop from the design bar.
+
+*drag template icon* -> Choose Template: "Simple_Kafka_Flow" -> Add
+
 ## Stop
 
 Simply ``docker-compose down`` to stop the cluster and destroy the containers. If you want to preserve the containers then use ``docker-compose stop``.
