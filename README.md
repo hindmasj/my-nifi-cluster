@@ -16,7 +16,7 @@ sudo chown -R 1000.1000 ../flow_storage
 
 ## Start
 
-To simply start the cluster up and connect to the NiFi desktop.
+To start the cluster up and connect to the NiFi desktop.
 
 1. Start the cluster with ``docker compose up -d``. The cluster will start 3 NiFi nodes to hold a proper election for master.
 1. Run ``./get-nifi-url.sh`` and note the URL that is returned. It will be something like *http\://localhost:\<port\>/nifi*.
@@ -34,7 +34,7 @@ http://localhost:62142/nifi
 
 ## Create Flows
 
-Once connected to the GUI you can create your flows. To get you started their is a simple one stored under the templates directory. Load it from the NiFi desktop.
+Once connected to the GUI you can create your flows. To get you started there is a simple one stored under the templates directory. Load it from the NiFi desktop.
 
 *right click* -> Upload Template -> *browse* -> "Simple_Kafka_Flow.xml" -> Upload
 
@@ -172,7 +172,20 @@ Connect to the registry GUI with http://localhost:18080/nifi-registry.
 
 ## First Time
 
-The first time you use the registry you need to set up the bucket, and optionally put a flow into it. See [Connect Cluster to Registry](#cctr)
+The first time you use the registry you need to set up the bucket, and optionally put a flow into it. See [Connect Cluster to Registry](#cctr).
+
+## Afterwards
+
+Once the registry has been set up, any flows created will get stored in the local git repo, giving you persistence.
+
+If you restart the cluster you will see in the registry that your flow definitions have been preserved.
+
+On NiFi you need to create the registry client as described previously. Then import the flow onto the desktop.
+
+1. Drag a process group from the design bar onto the desktop.
+1. Click "Import from Registry".
+1. Select the bucket, flow and version you want.
+1. Click "Import".
 
 # Issues
 
