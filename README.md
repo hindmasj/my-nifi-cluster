@@ -3,6 +3,15 @@ Quick project to create a NiFi cluster in Docker
 
 Inspired by article [Running a cluster with Apache Nifi and Docker](https://www.nifi.rocks/apache-nifi-docker-compose-cluster/) and shamelessly pinched their compose file, hence the Apache licence.
 
+# Installation
+
+Before starting you will need to create a new git repo to store the flows in. It is not a good idea to use this repo.
+
+````
+git init ../flow_storage
+sudo chown -R 1000.1000 ../flow_storage
+````
+
 # Operation
 
 ## Start
@@ -161,7 +170,9 @@ A NiFi registry service has been added to make persistence of flows easier than 
 
 Connect to the registry GUI with http://localhost:18080/nifi-registry.
 
-[[More To Do]]
+## First Time
+
+The first time you use the registry you need to set up the bucket, and optionally put a flow into it. See [Connect Cluster to Registry](#cctr)
 
 # Issues
 
@@ -202,3 +213,28 @@ Use the [Apache](https://hub.docker.com/r/apache/nifi-registry) image. Tasks are
 
 1. Connect cluster to registry.
 2. Connect registry to a git instance.
+
+### <a name="cctr">Connect Cluster to Registry</a>
+
+This seems to be manual from the NiFi desktop. Note you cannot register processors or the whole system, only processor groups.
+
+1. In registry click the wrench then create a new bucket.
+1. In NiFi use the menu "Controller Settings" -> "Registry Clients".
+1. Add a new client with URL "http://registry:18080".
+1. On the desktop create a processor group.
+1. Inside the group, drag in the template for the test flow.
+1. On the background, right click and select "Version" -> "Start version control".
+1. In the dialogue give the flow a name and click save.
+
+You will see that the test bucket and the flow snapshot have been created in the git repo.
+
+### Connect to Git
+
+There is a file called *providers.xml* in */opt/nifi-registry/nifi-registry-current/conf*. This has the settings for a Git provider commented out. Use the configs option to remount a local file.
+
+This then needs to connect into a local git repo, not this one in case you do not want to share your work to GitHub. So create a parallel repo called "flow_storage". Which then means mounting that repo into the registry service container. The repo also needs permissions set for others to write. As the image causes all actions to be run by user 1000, just change the UID and GID.
+
+````
+git init flow_storage
+chown -R 1000.1000 flow_storage
+````

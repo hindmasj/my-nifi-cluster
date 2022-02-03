@@ -37,9 +37,15 @@ services:
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
   registry:
     hostname: registry
+    container_name: registry
     image: apache/nifi-registry:latest
     ports:
       - "18080:18080"
+    configs:
+      - source: providers
+        target: /opt/nifi-registry/nifi-registry-current/conf/providers.xml
+    volumes:
+      - ../flow_storage:/mnt/flow_storage:rw
   nifi:
     image: apache/nifi:latest
     depends_on:
@@ -58,3 +64,6 @@ services:
       - NIFI_ZK_CONNECT_STRING=zookeeper:2181
       - NIFI_ELECTION_MAX_WAIT=1 min
       - NIFI_SENSITIVE_PROPS_KEY=3e38a10eb5fb
+configs:
+  providers:
+    file: ./providers.xml
