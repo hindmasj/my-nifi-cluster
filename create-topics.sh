@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
-PREFIX=my-nifi-cluster
 SERVICE=kafka
 PORT=9092
-BOOTSTRAP=${PREFIX}-${SERVICE}-1:${PORT}
+BOOTSTRAP=${SERVICE}:${PORT}
 
 RETAIN=36000000
 REPLIC=3

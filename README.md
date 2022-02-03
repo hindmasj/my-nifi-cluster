@@ -10,10 +10,10 @@ Inspired by article [Running a cluster with Apache Nifi and Docker](https://www.
 To simply start the cluster up and connect to the NiFi desktop.
 
 1. Start the cluster with ``docker compose up -d``. The cluster will start 3 NiFi nodes to hold a proper election for master.
-1. Run ``docker ps`` to get the port mappings from network 0.0.0.0 to port 8080 to one of those nodes.
-1. Connect to the web server at *http\://localhost:\<port\>/nifi*.
+1. Run ``./get-nifi-url.sh`` and note the URL that is returned. It will be something like *http\://localhost:\<port\>/nifi*.
+1. Copy and paste that URL into your browser to connect to the NiFi desktop. On WSL you only need to hover over the URL and then *ctrl-click*.
 
-For example
+What the "get" script does is run ``docker ps`` to get the port mappings from network 0.0.0.0 to port 8080 to one of those nodes. For example
 
 ````
 $ docker compose ps
@@ -28,7 +28,7 @@ Then the bit you want is: ``my-nifi-cluster-nifi-1 ... 0.0.0.0:61892->8080/tcp``
 
 ## Create Flows
 
-Once connected to the GUI you can create your flows. To get you started their is a simple stored under the templates directory. Load it from NiFi desktop.
+Once connected to the GUI you can create your flows. To get you started their is a simple one stored under the templates directory. Load it from the NiFi desktop.
 
 *right click* -> Upload Template -> *browse* -> "Simple_Kafka_Flow.xml" -> Upload
 
@@ -42,7 +42,10 @@ Then add the template onto the desktop from the design bar.
 
 You can run one-off Kafka commands by using the ``docker compose run <service> <...>`` command, which spins up a separate container using the same image but running the command. This however is quite slow as you need to spin up the container for each single command.
 
-**Start a Client Console**
+#### Start a Client Console
+
+You can run ad hoc commands on a client container.
+
 ````
 $ docker compose run kafka bash
 [+] Running 1/0
@@ -64,7 +67,12 @@ exit
 $
 ````
 
+#### Run a Client Command
+
+You can run specific scripts or commands that are already in container.
+
 **Create a Topic**
+
 ````
 $ docker compose run kafka kafka-topics.sh \
   --bootstrap-server my-nifi-cluster-kafka-1:9092 \
@@ -110,6 +118,39 @@ docker compose run --volume <path-to-mount>:<mount-point> kafka <mount-point>/<s
 ````
 
 See the scripts *launch-script.sh* and *create-topics.sh* to see an example of how this is done.
+
+## Process Some Data
+
+By now you should have loaded the flow into NiFi and set up the topics on Kafka. Now is the time to move data.
+
+1. Start all of the processes in the flow by pressing the start button on the *Operate* dialogue.
+1. Send a simple message to the source topic. (*ctrl-D* to end)
+1. Observe the messages being processed in the flow.
+1. Retrieve the message from the sink topic. (*ctrl-C* to end)
+
+For a bit more fun you can run both Kafka commands in separate consoles and see each message flowing.
+
+### Send Some Data
+
+````
+$ docker compose run kafka kafka-console-producer.sh \
+ --bootstrap-server kafka:9092 --topic my.source.topic
+>hello world
+>now is the time
+>one is the number
+> ^D
+````
+
+### Receive Some Data
+
+````
+$ docker compose run kafka kafka-console-consumer.sh \
+ --bootstrap-server kafka:9092 --topic my.sink.topic --offset earliest --partition 0
+hello world
+now is the time
+one is the number
+^C
+````
 
 ## Stop
 

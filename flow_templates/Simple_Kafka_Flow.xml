@@ -1,129 +1,62 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <template encoding-version="1.3">
-    <description></description>
-    <groupId>ba30cd5d-017e-1000-f5c6-607ffebbfe65</groupId>
+    <description/>
+    <groupId>bf0db46c-017e-1000-f426-58c3567bf0fb</groupId>
     <name>Simple_Kafka_Flow</name>
     <snippet>
         <connections>
-            <id>468fc0d9-6dcf-3697-0000-000000000000</id>
-            <parentGroupId>78b1541f-5594-36ca-0000-000000000000</parentGroupId>
+            <id>45db8a44-f193-30f2-0000-000000000000</id>
+            <parentGroupId>8a5a7a7c-e64e-322f-0000-000000000000</parentGroupId>
             <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
             <backPressureObjectThreshold>10000</backPressureObjectThreshold>
             <destination>
-                <groupId>78b1541f-5594-36ca-0000-000000000000</groupId>
-                <id>413ef724-9d42-3506-0000-000000000000</id>
+                <groupId>8a5a7a7c-e64e-322f-0000-000000000000</groupId>
+                <id>3567d1ba-7ea7-3f9a-0000-000000000000</id>
                 <type>PROCESSOR</type>
             </destination>
             <flowFileExpiration>0 sec</flowFileExpiration>
             <labelIndex>1</labelIndex>
             <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
-            <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+            <loadBalancePartitionAttribute/>
             <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
             <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
-            <name></name>
+            <name/>
             <selectedRelationships>failure</selectedRelationships>
             <source>
-                <groupId>78b1541f-5594-36ca-0000-000000000000</groupId>
-                <id>878eaefb-3861-393e-0000-000000000000</id>
+                <groupId>8a5a7a7c-e64e-322f-0000-000000000000</groupId>
+                <id>7a67799c-f7d2-3d26-0000-000000000000</id>
                 <type>PROCESSOR</type>
             </source>
             <zIndex>0</zIndex>
         </connections>
         <connections>
-            <id>f702e288-9e7f-3d15-0000-000000000000</id>
-            <parentGroupId>78b1541f-5594-36ca-0000-000000000000</parentGroupId>
+            <id>49ac6c30-1401-36c3-0000-000000000000</id>
+            <parentGroupId>8a5a7a7c-e64e-322f-0000-000000000000</parentGroupId>
             <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
             <backPressureObjectThreshold>10000</backPressureObjectThreshold>
             <destination>
-                <groupId>78b1541f-5594-36ca-0000-000000000000</groupId>
-                <id>878eaefb-3861-393e-0000-000000000000</id>
+                <groupId>8a5a7a7c-e64e-322f-0000-000000000000</groupId>
+                <id>7a67799c-f7d2-3d26-0000-000000000000</id>
                 <type>PROCESSOR</type>
             </destination>
             <flowFileExpiration>0 sec</flowFileExpiration>
             <labelIndex>1</labelIndex>
             <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
-            <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+            <loadBalancePartitionAttribute/>
             <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
             <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
-            <name></name>
+            <name/>
             <selectedRelationships>success</selectedRelationships>
             <source>
-                <groupId>78b1541f-5594-36ca-0000-000000000000</groupId>
-                <id>4bb6c5e4-8b39-323f-0000-000000000000</id>
+                <groupId>8a5a7a7c-e64e-322f-0000-000000000000</groupId>
+                <id>200270d3-4345-35c6-0000-000000000000</id>
                 <type>PROCESSOR</type>
             </source>
             <zIndex>0</zIndex>
         </connections>
         <processors>
-            <id>413ef724-9d42-3506-0000-000000000000</id>
-            <parentGroupId>78b1541f-5594-36ca-0000-000000000000</parentGroupId>
-            <position>
-                <x>0.0</x>
-                <y>520.0</y>
-            </position>
-            <bundle>
-                <artifact>nifi-standard-nar</artifact>
-                <group>org.apache.nifi</group>
-                <version>1.15.3</version>
-            </bundle>
-            <config>
-                <bulletinLevel>WARN</bulletinLevel>
-                <comments></comments>
-                <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
-                <descriptors>
-                    <entry>
-                        <key>log-level</key>
-                        <value>
-                            <name>log-level</name>
-                        </value>
-                    </entry>
-                    <entry>
-                        <key>log-prefix</key>
-                        <value>
-                            <name>log-prefix</name>
-                        </value>
-                    </entry>
-                    <entry>
-                        <key>log-message</key>
-                        <value>
-                            <name>log-message</name>
-                        </value>
-                    </entry>
-                </descriptors>
-                <executionNode>ALL</executionNode>
-                <lossTolerant>false</lossTolerant>
-                <penaltyDuration>30 sec</penaltyDuration>
-                <properties>
-                    <entry>
-                        <key>log-level</key>
-                        <value>warn</value>
-                    </entry>
-                    <entry>
-                        <key>log-prefix</key>
-                        <value>Failed to publish kafka message: </value>
-                    </entry>
-                    <entry>
-                        <key>log-message</key>
-                    </entry>
-                </properties>
-                <runDurationMillis>0</runDurationMillis>
-                <schedulingPeriod>0 sec</schedulingPeriod>
-                <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
-                <yieldDuration>1 sec</yieldDuration>
-            </config>
-            <executionNodeRestricted>false</executionNodeRestricted>
-            <name>LogMessage</name>
-            <relationships>
-                <autoTerminate>true</autoTerminate>
-                <name>success</name>
-            </relationships>
-            <state>STOPPED</state>
-            <style/>
-            <type>org.apache.nifi.processors.standard.LogMessage</type>
-        </processors>
-        <processors>
-            <id>4bb6c5e4-8b39-323f-0000-000000000000</id>
-            <parentGroupId>78b1541f-5594-36ca-0000-000000000000</parentGroupId>
+            <id>200270d3-4345-35c6-0000-000000000000</id>
+            <parentGroupId>8a5a7a7c-e64e-322f-0000-000000000000</parentGroupId>
             <position>
                 <x>0.0</x>
                 <y>0.0</y>
@@ -135,7 +68,7 @@
             </bundle>
             <config>
                 <bulletinLevel>WARN</bulletinLevel>
-                <comments></comments>
+                <comments/>
                 <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
                 <descriptors>
                     <entry>
@@ -308,7 +241,7 @@
                 <properties>
                     <entry>
                         <key>bootstrap.servers</key>
-                        <value>localhost:9092</value>
+                        <value>kafka:9092</value>
                     </entry>
                     <entry>
                         <key>topic</key>
@@ -417,8 +350,75 @@
             <type>org.apache.nifi.processors.kafka.pubsub.ConsumeKafka_2_6</type>
         </processors>
         <processors>
-            <id>878eaefb-3861-393e-0000-000000000000</id>
-            <parentGroupId>78b1541f-5594-36ca-0000-000000000000</parentGroupId>
+            <id>3567d1ba-7ea7-3f9a-0000-000000000000</id>
+            <parentGroupId>8a5a7a7c-e64e-322f-0000-000000000000</parentGroupId>
+            <position>
+                <x>0.0</x>
+                <y>520.0</y>
+            </position>
+            <bundle>
+                <artifact>nifi-standard-nar</artifact>
+                <group>org.apache.nifi</group>
+                <version>1.15.3</version>
+            </bundle>
+            <config>
+                <bulletinLevel>WARN</bulletinLevel>
+                <comments/>
+                <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                <descriptors>
+                    <entry>
+                        <key>log-level</key>
+                        <value>
+                            <name>log-level</name>
+                        </value>
+                    </entry>
+                    <entry>
+                        <key>log-prefix</key>
+                        <value>
+                            <name>log-prefix</name>
+                        </value>
+                    </entry>
+                    <entry>
+                        <key>log-message</key>
+                        <value>
+                            <name>log-message</name>
+                        </value>
+                    </entry>
+                </descriptors>
+                <executionNode>ALL</executionNode>
+                <lossTolerant>false</lossTolerant>
+                <penaltyDuration>30 sec</penaltyDuration>
+                <properties>
+                    <entry>
+                        <key>log-level</key>
+                        <value>warn</value>
+                    </entry>
+                    <entry>
+                        <key>log-prefix</key>
+                        <value>Failed to publish kafka message: </value>
+                    </entry>
+                    <entry>
+                        <key>log-message</key>
+                    </entry>
+                </properties>
+                <runDurationMillis>0</runDurationMillis>
+                <schedulingPeriod>0 sec</schedulingPeriod>
+                <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                <yieldDuration>1 sec</yieldDuration>
+            </config>
+            <executionNodeRestricted>false</executionNodeRestricted>
+            <name>LogMessage</name>
+            <relationships>
+                <autoTerminate>true</autoTerminate>
+                <name>success</name>
+            </relationships>
+            <state>STOPPED</state>
+            <style/>
+            <type>org.apache.nifi.processors.standard.LogMessage</type>
+        </processors>
+        <processors>
+            <id>7a67799c-f7d2-3d26-0000-000000000000</id>
+            <parentGroupId>8a5a7a7c-e64e-322f-0000-000000000000</parentGroupId>
             <position>
                 <x>0.0</x>
                 <y>280.0</y>
@@ -430,7 +430,7 @@
             </bundle>
             <config>
                 <bulletinLevel>WARN</bulletinLevel>
-                <comments></comments>
+                <comments/>
                 <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
                 <descriptors>
                     <entry>
@@ -615,7 +615,7 @@
                 <properties>
                     <entry>
                         <key>bootstrap.servers</key>
-                        <value>localhost:9092</value>
+                        <value>kafka:9092</value>
                     </entry>
                     <entry>
                         <key>topic</key>
@@ -733,5 +733,5 @@
             <type>org.apache.nifi.processors.kafka.pubsub.PublishKafka_2_6</type>
         </processors>
     </snippet>
-    <timestamp>02/02/2022 11:50:58 UTC</timestamp>
+    <timestamp>02/03/2022 12:01:21 UTC</timestamp>
 </template>
