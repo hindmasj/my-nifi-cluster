@@ -35,10 +35,16 @@ services:
     environment:
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+  registry:
+    hostname: registry
+    image: apache/nifi-registry:latest
+    ports:
+      - "18080:18080"
   nifi:
     image: apache/nifi:latest
     depends_on:
       - zookeeper
+      - registry
     deploy:
       mode: replicated
       replicas: 3

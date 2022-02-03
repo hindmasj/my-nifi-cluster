@@ -13,18 +13,15 @@ To simply start the cluster up and connect to the NiFi desktop.
 1. Run ``./get-nifi-url.sh`` and note the URL that is returned. It will be something like *http\://localhost:\<port\>/nifi*.
 1. Copy and paste that URL into your browser to connect to the NiFi desktop. On WSL you only need to hover over the URL and then *ctrl-click*.
 
-What the "get" script does is run ``docker ps`` to get the port mappings from network 0.0.0.0 to port 8080 to one of those nodes. For example
+What the "get" script does is run ``docker compose port nifi 8080`` to get one the port mappings for the NiFi service, then extracts the port part to create a URL.
 
 ````
-$ docker compose ps
-NAME                     COMMAND                  SERVICE             STATUS              PORTS
-my-nifi-cluster-nifi-1   "../scripts/start.sh"    nifi                running             0.0.0.0:64009->8080/tcp
-my-nifi-cluster-nifi-2   "../scripts/start.sh"    nifi                running             0.0.0.0:64008->8080/tcp
-my-nifi-cluster-nifi-3   "../scripts/start.sh"    nifi                running             0.0.0.0:64007->8080/tcp
-zookeeper                "/opt/bitnami/script…"   zookeeper           running             8080/tcp
-````
+$ docker compose port nifi 8080
+0.0.0.0:62142
 
-Then the bit you want is: ``my-nifi-cluster-nifi-1 ... 0.0.0.0:61892->8080/tcp`` and you need port 61892.
+$ ./get-nifi-url.sh
+http://localhost:62142/nifi
+````
 
 ## Create Flows
 
@@ -158,6 +155,14 @@ one is the number
 
 Simply ``docker compose down`` to stop the cluster and destroy the containers. If you want to preserve the containers then use ``docker compose stop``.
 
+# Using the Registry
+
+A NiFi registry service has been added to make persistence of flows easier than having to use the template method.
+
+Connect to the registry GUI with http://localhost:18080/nifi-registry.
+
+[[More To Do]]
+
 # Issues
 
 ## Update Sensitive Key
@@ -190,3 +195,10 @@ deploy:
 ## Adding Kafka Cluster
 
 Use the [bitnami](https://bitnami.com/stack/kafka/containers) image, as we are already using their zookeeper image.
+
+## Adding NiFi Registry
+
+Use the [Apache](https://hub.docker.com/r/apache/nifi-registry) image. Tasks are as follows. Using the [guide](https://nifi.apache.org/docs/nifi-registry-docs/index.html).
+
+1. Connect cluster to registry.
+2. Connect registry to a git instance.
