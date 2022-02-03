@@ -40,7 +40,9 @@ Then add the template onto the desktop from the design bar.
 
 ### One Off Commands
 
-You can run one-off Kafka commands by using the ``docker compose run <service> <...>`` command, which spins up a separate container using the same image but running the command. This however is quite slow as you need to spin up the container for each single command.
+You can run one-off Kafka commands by using the ``docker compose run <service> <...>`` command, which spins up a separate container using the same image but running the command. This however can be quite slow as you need to spin up the container for each single command.
+
+After a while these containers accumulate, which you can see with ``docker compose ps -a``. If this becomes a problem then tidy them up with ``docker container prune``.
 
 #### Start a Client Console
 
@@ -62,20 +64,20 @@ I have no name!@d2f135d230e4:/$ echo $PATH
 I have no name!@d2f135d230e4:/$ ls /opt/bitnami/kafka/bin
 connect-distributed.sh        kafka-console-consumer.sh    ...
 
-I have no name!@7e44e251ba32:/$ exit
+I have no name!@d2f135d230e4:/$ exit
 exit
 $
 ````
 
 #### Run a Client Command
 
-You can run specific scripts or commands that are already in container.
+You can run specific scripts or commands that are already in container. Notice you can use the service alias "kafka" as shorthand for the first available kafka broker.
 
 **Create a Topic**
 
 ````
 $ docker compose run kafka kafka-topics.sh \
-  --bootstrap-server my-nifi-cluster-kafka-1:9092 \
+  --bootstrap-server kafka:9092 \
   --create --topic my.source.topic \
   --replication-factor 3 --config retention.ms=36000000
 
@@ -94,7 +96,7 @@ Created topic my.source.topic.
 **Describe a Topic**
 ````
 $ docker compose run kafka kafka-topics.sh \
-  --bootstrap-server my-nifi-cluster-kafka-1:9092 \
+  --bootstrap-server kafka:9092 \
   --describe --topic my.source.topic
 
 [+] Running 1/0
