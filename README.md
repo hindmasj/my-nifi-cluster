@@ -14,6 +14,16 @@ sudo chown -R 1000.1000 ../flow_storage
 
 # Operation
 
+## Quickstart
+
+1. Start the cluster ``docker compose up -d``.
+1. Create some topics ``./launch-script.sh``.
+1. Get the cluster URL ``./get-nifi-url.sh``.
+1. Post the URL in your browser.
+1. Build some flows, process some data.
+
+See how to load flows from a [template](#template) or from the [NiFi registry](#registry). Then look at producing and consuming data with [Kafka](#process).
+
 ## Start
 
 To start the cluster up and connect to the NiFi desktop.
@@ -32,7 +42,7 @@ $ ./get-nifi-url.sh
 http://localhost:62142/nifi
 ````
 
-## Create Flows
+## <a name="template"></a>Create Flows
 
 Once connected to the GUI you can create your flows. To get you started there is a simple one stored under the templates directory. Load it from the NiFi desktop.
 
@@ -127,7 +137,7 @@ docker compose run --volume <path-to-mount>:<mount-point> kafka <mount-point>/<s
 
 See the scripts *launch-script.sh* and *create-topics.sh* to see an example of how this is done.
 
-## Process Some Data
+## <a name="process"></a>Process Some Data
 
 By now you should have loaded the flow into NiFi and set up the topics on Kafka. Now is the time to move data.
 
@@ -164,7 +174,7 @@ one is the number
 
 Simply ``docker compose down`` to stop the cluster and destroy the containers. If you want to preserve the containers then use ``docker compose stop``.
 
-# Using the Registry
+# <a name="registry"></a>Using the Registry
 
 A NiFi registry service has been added to make persistence of flows easier than having to use the template method.
 
