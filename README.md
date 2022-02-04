@@ -1,7 +1,7 @@
 # my-nifi-cluster
 Quick project to create a NiFi cluster in Docker
 
-Inspired by article [Running a cluster with Apache Nifi and Docker](https://www.nifi.rocks/apache-nifi-docker-compose-cluster/) and shamelessly pinched their compose file, hence the Apache licence.
+Inspired by article [Running a cluster with Apache Nifi and Docker](https://www.nifi.rocks/apache-nifi-docker-compose-cluster/) and shamelessly pinched their compose file, hence the Apache licence. Uses the [Apache NiFi Image](https://hub.docker.com/r/apache/nifi).
 
 # Installation
 
@@ -197,6 +197,18 @@ On NiFi you need to create the registry client as described previously. Then imp
 1. Select the bucket, flow and version you want.
 1. Click "Import".
 
+# Custom Processors
+
+See the [NiFi Admin Guide](https://nifi.apache.org/docs/nifi-docs/html/administration-guide.html#processor-locations) for details of where to put custom processor NARs. See the "Issues" section further down to see discussion of what has been done.
+
+Use the docker copy command to put your custom processor NAR files into the automatic library directory, which is */opt/nifi/nifi-current/extensions/*.
+
+```
+docker compose cp <path-to-nar-file> nifi:/opt/nifi/nifi-current/extensions/
+````
+
+Note that the NAR must have been compiled under Java 1.8.0.
+
 # Issues
 
 ## Update Sensitive Key
@@ -257,7 +269,21 @@ There is a file called *providers.xml* in */opt/nifi-registry/nifi-registry-curr
 
 This then needs to connect into a local git repo, not this one in case you do not want to share your work to GitHub. So create a parallel repo called "flow_storage". Which then means mounting that repo into the registry service container. The repo also needs permissions set for others to write. As the image causes all actions to be run by user 1000, just change the UID and GID.
 
-````
+```
 git init flow_storage
 chown -R 1000.1000 flow_storage
-````
+```
+
+## Custom Processors
+
+Tried to create a custom processor directory by setting the property *nifi.nar.library.directory.&lt;label&gt;*.
+
+First attempt was to set an environment variable "NIFI_NAR_LIBRARY_DIRECTORY_CUSTOM", and then create a volume to match the value. The volume was mounted but the ENV did not take affect, so the contents were never loaded.
+
+Then looked at using a config setting to map a local copy of *nifi.properties* onto the one inside the container. But this failed because it seems NiFi rewrites the property file after gathering all the ENVs. This failed as the config method mounts the file read only.
+
+So the next best option seems to be to copy any files to the autoload directory, *${NIFI_HOME}/extensions*, and have the nodes load the NAR in life.
+
+The other option might be to use either config or volume options to load individual NAR files into the standard library directory, *${NIFI_HOME}/lib*. But this will involve changing the *docker-compose.yml* file.
+
+BTW, the image seems to only have Java 1.8.0 installed, and the processors I had to hand would only compile under 11, so the test involves looking for the error message in nifi-app.log.
