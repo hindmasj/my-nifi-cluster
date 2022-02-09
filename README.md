@@ -213,7 +213,7 @@ Note that the NAR must have been compiled under Java 1.8.0.
 
 There is a maven project included which creates a very simple processor which just add the phrase "APPROVED" to the end of any message it sees in the flow.
 
-Build the project with ``mvn clean package`` and this produces a NAR file *target/nifi-&lt;version&gt;.nar* which can then be loaded into the cluster as outlined above. 
+Build the project with ``mvn clean package`` and this produces a NAR file *archiver/target/nifi-hindmasj-processors-&lt;version&gt;.nar* which can then be loaded into the cluster as outlined above.
 
 # Issues
 
@@ -293,3 +293,5 @@ So the next best option seems to be to copy any files to the autoload directory,
 The other option might be to use either config or volume options to load individual NAR files into the standard library directory, *${NIFI_HOME}/lib*. But this will involve changing the *docker-compose.yml* file.
 
 BTW, the image seems to only have Java 1.8.0 installed, and the processors I had to hand would only compile under 11, so the test involves looking for the error message in nifi-app.log.
+
+Late breaking brainwave: load the NAR into lib directory, then restart the NiFi service. The file will be preserved, as will any flows and the link to the registry.

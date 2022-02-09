@@ -7,7 +7,12 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.io.IOUtils;
 
+import org.apache.nifi.annotation.behavior.*;
+import org.apache.nifi.annotation.behavior.InputRequirement.Requirement;
+import org.apache.nifi.annotation.documentation.*;
+
 import org.apache.nifi.flowfile.FlowFile;
+
 import org.apache.nifi.processor.AbstractProcessor;
 import org.apache.nifi.processor.ProcessContext;
 import org.apache.nifi.processor.ProcessSession;
@@ -15,6 +20,11 @@ import org.apache.nifi.processor.ProcessorInitializationContext;
 import org.apache.nifi.processor.Relationship;
 import org.apache.nifi.processor.exception.ProcessException;
 
+@EventDriven
+@Tags({"Text"})
+@CapabilityDescription("Adds an approval string to any message")
+@InputRequirement(Requirement.INPUT_REQUIRED)
+@SupportsBatching
 public class TextApprovalProcessor extends AbstractProcessor{
 
   public static final String APPROVED=" APPROVED";
