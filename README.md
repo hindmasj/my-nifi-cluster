@@ -205,9 +205,15 @@ Use the docker copy command to put your custom processor NAR files into the auto
 
 ```
 docker compose cp <path-to-nar-file> nifi:/opt/nifi/nifi-current/extensions/
-````
+```
 
 Note that the NAR must have been compiled under Java 1.8.0.
+
+## Text Approval Processor
+
+There is a maven project included which creates a very simple processor which just add the phrase "APPROVED" to the end of any message it sees in the flow.
+
+Build the project with ``mvn clean package`` and this produces a NAR file *target/nifi-&lt;version&gt;.nar* which can then be loaded into the cluster as outlined above. 
 
 # Issues
 
