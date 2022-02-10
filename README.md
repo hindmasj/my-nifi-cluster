@@ -46,11 +46,11 @@ http://localhost:62142/nifi
 
 Once connected to the GUI you can create your flows. To get you started there is a simple one stored under the templates directory. Load it from the NiFi desktop.
 
-*right click* -> Upload Template -> *browse* -> "Simple_Kafka_Flow.xml" -> Upload
+&nbsp; &nbsp; *right click* -> Upload Template -> *browse* -> "Simple_Kafka_Flow.xml" -> Upload
 
 Then add the template onto the desktop from the design bar.
 
-*drag template icon* -> Choose Template: "Simple_Kafka_Flow" -> Add
+&nbsp; &nbsp; *drag template icon* -> Choose Template: "Simple_Kafka_Flow" -> Add
 
 ## Manage Kafka
 
@@ -182,15 +182,23 @@ Connect to the registry GUI with http://localhost:18080/nifi-registry.
 
 ## First Time
 
-The first time you use the registry you need to set up the bucket, and optionally put a flow into it. See [Connect Cluster to Registry](#cctr).
+The first time you use the registry you need to set up the bucket, and optionally put a flow into it. This is a manual process.
+
+1. In registry click the wrench then create a new bucket.
+1. In NiFi use the menu "Controller Settings" -> "Registry Clients".
+1. Add a new client with URL "`http://registry:18080/`".
+1. On the desktop create a processor group.
+1. Inside the group, drag in the template for the test flow.
+1. On the background, right click and select "Version" -> "Start version control".
+1. In the dialogue give the flow a name and click save.
+
+You will see that the test bucket and the flow snapshot have been created in the git repo.
 
 ## Afterwards
 
-Once the registry has been set up, any flows created will get stored in the local git repo, giving you persistence.
+Once the registry has been set up, any flows created will get stored in the local git repo, giving you persistence. If you restart the cluster you will see in the registry that your flow definitions have been preserved.
 
-If you restart the cluster you will see in the registry that your flow definitions have been preserved.
-
-On NiFi you need to create the registry client as described previously. Then import the flow onto the desktop.
+On NiFi you still need to create the registry client link as described above to "`http://registry:18080/`". Then import the flow onto the desktop.
 
 1. Drag a process group from the design bar onto the desktop.
 1. Click "Import from Registry".
@@ -201,13 +209,19 @@ On NiFi you need to create the registry client as described previously. Then imp
 
 See the [NiFi Admin Guide](https://nifi.apache.org/docs/nifi-docs/html/administration-guide.html#processor-locations) for details of where to put custom processor NARs. See the "Issues" section further down to see discussion of what has been done.
 
-Use the docker copy command to put your custom processor NAR files into the automatic library directory, which is */opt/nifi/nifi-current/extensions/*.
+Use the docker copy command to put your custom processor NAR files into the automatic library directory, which is */opt/nifi/nifi-current/extensions/*. Make sure to use the *--all* flag to ensure the file is copied to all of the NiFi containers.
 
 ```
-docker compose cp <path-to-nar-file> nifi:/opt/nifi/nifi-current/extensions/
+docker compose cp --all <path-to-nar-file> nifi:/opt/nifi/nifi-current/extensions/
 ```
 
-Note that the NAR must have been compiled under Java 1.8.0.
+Note that for these docker images the NAR must have been compiled under Java 1.8.0. Refresh the NiFi GUI in your browser before trying to use the new processor.
+
+If you try to load the processor **again**, then you will need to restart the NiFi service, as the class loaders will not load an existing class.
+
+```
+docker compose restart nifi
+```
 
 ## Text Approval Processor
 
@@ -259,16 +273,6 @@ Use the [Apache](https://hub.docker.com/r/apache/nifi-registry) image. Tasks are
 
 This seems to be manual from the NiFi desktop. Note you cannot register processors or the whole system, only processor groups.
 
-1. In registry click the wrench then create a new bucket.
-1. In NiFi use the menu "Controller Settings" -> "Registry Clients".
-1. Add a new client with URL "http://registry:18080".
-1. On the desktop create a processor group.
-1. Inside the group, drag in the template for the test flow.
-1. On the background, right click and select "Version" -> "Start version control".
-1. In the dialogue give the flow a name and click save.
-
-You will see that the test bucket and the flow snapshot have been created in the git repo.
-
 ### Connect to Git
 
 There is a file called *providers.xml* in */opt/nifi-registry/nifi-registry-current/conf*. This has the settings for a Git provider commented out. Use the configs option to remount a local file.
@@ -295,3 +299,5 @@ The other option might be to use either config or volume options to load individ
 BTW, the image seems to only have Java 1.8.0 installed, and the processors I had to hand would only compile under 11, so the test involves looking for the error message in nifi-app.log.
 
 Late breaking brainwave: load the NAR into lib directory, then restart the NiFi service. The file will be preserved, as will any flows and the link to the registry.
+
+No, it was because it was not being copied to all containers. You have to use ``--all``.

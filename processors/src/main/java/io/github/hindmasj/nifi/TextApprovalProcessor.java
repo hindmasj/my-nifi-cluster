@@ -28,6 +28,7 @@ import org.apache.nifi.processor.exception.ProcessException;
 public class TextApprovalProcessor extends AbstractProcessor{
 
   public static final String APPROVED=" APPROVED";
+  public static final String MESSAGE_DELIM="\n";
 
   public static final Relationship SUCCESS = new Relationship.Builder()
   .name("Success")
@@ -68,20 +69,23 @@ public class TextApprovalProcessor extends AbstractProcessor{
     final AtomicReference<String[]> response = new AtomicReference<String[]>();
 
     try{
+
       session.read(flowFile, in -> {
         String flowContent = IOUtils.toString(in,StandardCharsets.UTF_8);
-        String[] flowMessages = flowContent.split("\n");
+        String[] flowMessages = flowContent.split(MESSAGE_DELIM);
         for(int i=0;i<flowMessages.length;i++){
           flowMessages[i]=flowMessages[i]+APPROVED;
         }
         response.set(flowMessages);
       });
 
-      session.transfer(session.write(
-      flowFile,
-      out->out.write(
-      objectToByteArray(response.toString())))
-      ,SUCCESS);
+      session.transfer(
+        session.write(
+          flowFile,
+          out->out.write(stringArrayToByteArray(response.get()))
+        ),
+        SUCCESS
+      );
 
     } catch (Exception e) {
       getLogger().error("Unhandled exception: "+e.getMessage());
@@ -91,8 +95,13 @@ public class TextApprovalProcessor extends AbstractProcessor{
 
   }
 
-  private static final byte[] objectToByteArray(Object object) {
-    return ((object.toString()).getBytes());
+  private byte[] stringArrayToByteArray(String[] array) {
+    StringBuffer buffer = new StringBuffer();
+    for(String s : array){
+      buffer.append(s);
+      buffer.append(MESSAGE_DELIM);
+    }
+    return buffer.toString().getBytes();
   }
 
 }
