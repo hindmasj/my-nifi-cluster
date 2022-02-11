@@ -286,6 +286,10 @@ chown -R 1000.1000 flow_storage
 
 ## Custom Processors
 
+### Loading The Processor
+
+As the NiFi process has already started by the time you get to copy a file to the lib directory, I needed to find a way to copy the NAR file in and have it picked up by the JVM without restarting the cluster.
+
 Tried to create a custom processor directory by setting the property *nifi.nar.library.directory.&lt;label&gt;*.
 
 First attempt was to set an environment variable "NIFI_NAR_LIBRARY_DIRECTORY_CUSTOM", and then create a volume to match the value. The volume was mounted but the ENV did not take affect, so the contents were never loaded.
@@ -301,3 +305,62 @@ BTW, the image seems to only have Java 1.8.0 installed, and the processors I had
 Late breaking brainwave: load the NAR into lib directory, then restart the NiFi service. The file will be preserved, as will any flows and the link to the registry.
 
 No, it was because it was not being copied to all containers. You have to use ``--all``.
+
+**Summary**
+
+1. If you copy the file into the extensions directory it will get loaded into the live node, ut you need to use the *--all* flag to ensure the file gets copied to all nodes.
+1. If you need to overwrite the file then the class loaders will not load same classes again. In this case you need to restart the NiFi service, **after** the copy, with ``docker compose restart nifi``.
+1. If you are going to do a restart anyway then you do other things, like load a new config file or push the NAR file to the lib directory.
+
+### Indexing The Processor
+
+As it first appeared in the index of processors, my custom processor did not have a domain name or version number when it appeared in the list.
+
+Looking at this article in medium, [Creating Custom Processors and Controllers in Apache NiFi](https://medium.com/hashmapinc/creating-custom-processors-and-controllers-in-apache-nifi-e14148740ea) to see if there are any clues. It uses a Maven archetype to generate the application layout, so I can check the POM file for any clues. Also see this article: [NiFi NAR Files Explained](https://medium.com/hashmapinc/nifi-nar-files-explained-14113f7796fd).
+
+Following the article I created the directory structure for the project *nifi-fred* and ran ``mvn package``, and the build almost completed, but failed packaging because of an enforcer error.
+
+```
+[INFO] --- maven-enforcer-plugin:3.0.0:enforce (enforce-no-snapshots) @ nifi-fred-nar ---
+[WARNING] Rule 0: org.apache.maven.plugins.enforcer.RequireReleaseDeps failed with message:
+Other than org apache nifi components themselves no snapshot dependencies are allowed
+Found Banned Dependency: io.github.hindmasj:nifi-fred-processors:jar:0.0.1-SNAPSHOT
+```
+
+I have seen this before and can be solved by turning off enforcement in the archiver POM file, *nifi-fred-nar/pom.xml*.
+
+```
+<build>
+  <pluginManagement>
+    <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </pluginManagement>
+</build>
+```
+
+So what are the differences? When I load both NARs into NiFi, the archetype one gets the right version and source group, but my local one is listed in the default source and shows up as "unversioned".
+
+In the root POM, the archetype has a parent setting, as follows.
+
+```
+<parent>
+    <groupId>org.apache.nifi</groupId>
+    <artifactId>nifi-nar-bundles</artifactId>
+    <version>1.15.3</version>
+</parent>
+```
+
+The archiver POM does not refer to the *nifi-nar-maven-plugin* plugin, but inherits this plugin from the above parent.
+
+So, step one, try this ... and that was the answer.
+
+The archetype has some extra dependencies for the processor, and an example unit test class, so that will be adopted too.
