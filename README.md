@@ -1,4 +1,4 @@
-# my-nifi-cluster
+# My NiFi Cluster
 Quick project to create a NiFi cluster in Docker
 
 Inspired by article [Running a cluster with Apache Nifi and Docker](https://www.nifi.rocks/apache-nifi-docker-compose-cluster/) and shamelessly pinched their compose file, hence the Apache licence. Uses the [Apache NiFi Image](https://hub.docker.com/r/apache/nifi).
@@ -7,10 +7,10 @@ Inspired by article [Running a cluster with Apache Nifi and Docker](https://www.
 
 Before starting you will need to create a new git repo to store the flows in. It is not a good idea to use this repo.
 
-````
+```
 git init ../flow_storage
 sudo chown -R 1000.1000 ../flow_storage
-````
+```
 
 # Operation
 
@@ -34,13 +34,13 @@ To start the cluster up and connect to the NiFi desktop.
 
 What the "get" script does is run ``docker compose port nifi 8080`` to get one the port mappings for the NiFi service, then extracts the port part to create a URL.
 
-````
+```
 $ docker compose port nifi 8080
 0.0.0.0:62142
 
 $ ./get-nifi-url.sh
 http://localhost:62142/nifi
-````
+```
 
 ## <a name="template"></a>Create Flows
 
@@ -64,7 +64,7 @@ After a while these containers accumulate, which you can see with ``docker compo
 
 You can run ad hoc commands on a client container.
 
-````
+```
 $ docker compose run kafka bash
 [+] Running 1/0
  ⠿ Container zookeeper Running 0.0s
@@ -83,7 +83,7 @@ connect-distributed.sh        kafka-console-consumer.sh    ...
 I have no name!@d2f135d230e4:/$ exit
 exit
 $
-````
+```
 
 #### Run a Client Command
 
@@ -91,7 +91,7 @@ You can run specific scripts or commands that are already in container. Notice y
 
 **Create a Topic**
 
-````
+```
 $ docker compose run kafka kafka-topics.sh \
   --bootstrap-server kafka:9092 \
   --create --topic my.source.topic \
@@ -107,10 +107,11 @@ kafka 09:43:21.19
 
 WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
 Created topic my.source.topic.
-````
+```
 
 **Describe a Topic**
-````
+
+```
 $ docker compose run kafka kafka-topics.sh \
   --bootstrap-server kafka:9092 \
   --describe --topic my.source.topic
@@ -125,15 +126,15 @@ kafka 09:45:45.42
 
 Topic: my.source.topic  TopicId: ou824ZiQRo-gELS07nh3mg PartitionCount: 1       ReplicationFactor: 3    Configs: segment.bytes=1073741824,retention.ms=36000000
         Topic: my.source.topic  Partition: 0    Leader: 1001    Replicas: 1001,1003,1002        Isr: 1001,1003,1002
-````
+```
 
 ### Running Scripts
 
 You can use the run command to also mount a local directory and then run any scripts that might be in there. Note that the paths must be absolute.
 
-````
+```
 docker compose run --volume <path-to-mount>:<mount-point> kafka <mount-point>/<script-name>
-````
+```
 
 See the scripts *launch-script.sh* and *create-topics.sh* to see an example of how this is done.
 
@@ -150,25 +151,25 @@ For a bit more fun you can run both Kafka commands in separate consoles and see 
 
 ### Send Some Data
 
-````
+```
 $ docker compose run kafka kafka-console-producer.sh \
  --bootstrap-server kafka:9092 --topic my.source.topic
 >hello world
 >now is the time
 >one is the number
 > ^D
-````
+```
 
 ### Receive Some Data
 
-````
+```
 $ docker compose run kafka kafka-console-consumer.sh \
  --bootstrap-server kafka:9092 --topic my.sink.topic --offset earliest --partition 0
 hello world
 now is the time
 one is the number
 ^C
-````
+```
 
 ## Stop
 
@@ -235,28 +236,28 @@ Build the project with ``mvn clean package`` and this produces a NAR file *archi
 
 Need to create a random key and set it as the sensitive key. This is a new requirement for NiFi from 1.14.0.
 
-````
+```sh
 echo $RANDOM|md5sum|head -c 20|tail -c 12;echo
 3e38a10eb5fb
-````
+```
 
 Add it to the compose file.
 
-````
+```yaml
 environment:
   ...
   - NIFI_SENSITIVE_PROPS_KEY=3e38a10eb5fb
-````
+```
 
 ## Fix Scaling To Automatic
 
 Original start command included ``--scale nifi=3`` but this is clumsy and I want 3 nodes by default. Added the deploy section to set this up.
 
-````
+```yaml
 deploy:
   mode: replicated
   replicas: 3
-````
+```
 
 ## Adding Kafka Cluster
 
@@ -329,7 +330,7 @@ Found Banned Dependency: io.github.hindmasj:nifi-fred-processors:jar:0.0.1-SNAPS
 
 I have seen this before and can be solved by turning off enforcement in the archiver POM file, *nifi-fred-nar/pom.xml*.
 
-```
+```xml
 <build>
   <pluginManagement>
     <plugins>
@@ -351,7 +352,7 @@ So what are the differences? When I load both NARs into NiFi, the archetype one 
 
 In the root POM, the archetype has a parent setting, as follows.
 
-```
+```xml
 <parent>
     <groupId>org.apache.nifi</groupId>
     <artifactId>nifi-nar-bundles</artifactId>
