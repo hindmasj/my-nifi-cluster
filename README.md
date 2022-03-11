@@ -22,6 +22,8 @@ sudo chown -R 1000.1000 ../flow_storage
 1. Post the URL in your browser.
 1. Build some flows, process some data.
 
+You might need to wait a minute from starting the cluster to using the URL, as it takes some time for all of the NiFi nodes to form a cluster.
+
 See how to load flows from a [template](#template) or from the [NiFi registry](#registry). Then look at producing and consuming data with [Kafka](#process).
 
 ## Start
@@ -32,7 +34,7 @@ To start the cluster up and connect to the NiFi desktop.
 1. Run ``./get-nifi-url.sh`` and note the URL that is returned. It will be something like *http\://localhost:\<port\>/nifi*.
 1. Copy and paste that URL into your browser to connect to the NiFi desktop. On WSL you only need to hover over the URL and then *ctrl-click*.
 
-What the "get" script does is run ``docker compose port nifi 8080`` to get one the port mappings for the NiFi service, then extracts the port part to create a URL.
+What the "get" script does is run ``docker compose port nifi 8080`` to get one of the port mappings for the NiFi service, then extracts the port part to create a URL.
 
 ```
 $ docker compose port nifi 8080
@@ -309,7 +311,7 @@ No, it was because it was not being copied to all containers. You have to use ``
 
 **Summary**
 
-1. If you copy the file into the extensions directory it will get loaded into the live node, ut you need to use the *--all* flag to ensure the file gets copied to all nodes.
+1. If you copy the file into the extensions directory it will get loaded into the live node, but you need to use the *--all* flag to ensure the file gets copied to all nodes.
 1. If you need to overwrite the file then the class loaders will not load same classes again. In this case you need to restart the NiFi service, **after** the copy, with ``docker compose restart nifi``.
 1. If you are going to do a restart anyway then you do other things, like load a new config file or push the NAR file to the lib directory.
 
@@ -365,3 +367,66 @@ The archiver POM does not refer to the *nifi-nar-maven-plugin* plugin, but inher
 So, step one, try this ... and that was the answer.
 
 The archetype has some extra dependencies for the processor, and an example unit test class, so that will be adopted too.
+
+# Standard processors
+
+Created a little task to convert a CSV file to JSON, then manipulate it. Using the "simple-traffic" sample files.
+
+## Services
+
+Create the following services.
+
+### Avro Schema Registry
+
+Create a new parameter called "SimpleTraffic" and copy the file "simple-traffic.schema" into the value.
+
+### CSV Reader
+
+Using the magic to enter a new line in record separator solved my initial problem.
+
+* Schema Access Strategy = Use Schema Property Name
+* Schema Registry = Avro Schema Registry
+* Schema Name = ${schema.name}
+* Record Separator = Shift+Enter
+* Value Separator = ,
+* Treat First Line As Header = false
+
+### Json Record Set Writer
+
+* Schema Access Strategy = Use Schema Property Name
+* Schema Registry = Avro Schema Registry
+* Schema Name = ${schema.name}
+
+### JSON Tree Reader
+
+* Schema Access Strategy = Use Schema Property Name
+* Schema Registry = Avro Schema Registry
+* Schema Name = ${schema.name}
+
+## Processors
+
+Start with the Consume Kafka from the sample and end with the Publish Kafka and Log Message processors. Then put these in between.
+
+### UpdateAttribute
+
+Tell the flow which schema we are using.
+
+* schema.name = SimpleTraffic
+
+### Convert Record
+
+Convert the CSV input records into the matching JSON schema.
+
+* Record Reader = CSVReader
+* Record Writer = JsonRecordSetWriter
+
+### Update Record
+
+Change those 0 and 1 values for the flags to false or true respectively. Note that each parameter is a path to a field in the record and must start with "/".
+
+* Record Reader = JsonTreeReader
+* Record Writer = JsonRecordSetWriter
+* Replacement Value Strategy = Literal Value
+* /flag_s = ${field.value:equals(1)}
+* /flag_a = ${field.value:equals(1)}
+* /flag_f = ${field.value:equals(1)}

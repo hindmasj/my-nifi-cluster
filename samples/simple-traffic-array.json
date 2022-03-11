@@ -1,0 +1,4 @@
+[{"src_address":"192.168.0.1","src_port":12977,"dst_address":"192.168.0.2","dst_port":80,"ip_version":4,"transport_protocol":6,"flag_s":1,"flag_a":1,"flag_f":1},
+{"src_address":"192.168.1.1","src_port":21799,"dst_address":"192.168.1.2","dst_port":80,"ip_version":4,"transport_protocol":6,"flag_s":0,"flag_a":0,"flag_f":0},
+{"src_address":"192.168.2.1","src_port":21799,"dst_address":"192.168.2.2","dst_port":53,"ip_version":4,"transport_protocol":17,"flag_s":0,"flag_a":0,"flag_f":0},
+{"src_address":"192.168.3.1","src_port":22799,"dst_address":"192.168.3.2","dst_port":53,"ip_version":4,"transport_protocol":17,"flag_s":0,"flag_a":0,"flag_f":0}]
