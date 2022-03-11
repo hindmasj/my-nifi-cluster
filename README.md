@@ -368,7 +368,7 @@ So, step one, try this ... and that was the answer.
 
 The archetype has some extra dependencies for the processor, and an example unit test class, so that will be adopted too.
 
-# Standard processors
+# Standard Processors
 
 Created a little task to convert a CSV file to JSON, then manipulate it. Using the "simple-traffic" sample files.
 
