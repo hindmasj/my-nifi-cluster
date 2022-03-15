@@ -17,8 +17,8 @@ sudo chown -R 1000.1000 ../flow_storage
 ## Quickstart
 
 1. Start the cluster ``docker compose up -d``.
-1. Create some topics ``./launch-script.sh``.
-1. Get the cluster URL ``./get-nifi-url.sh``.
+1. Create some topics ``bin/launch-script.sh``.
+1. Get the cluster URL ``bin/get-nifi-url.sh``.
 1. Post the URL in your browser.
 1. Build some flows, process some data.
 
@@ -31,7 +31,7 @@ See how to load flows from a [template](#template) or from the [NiFi registry](#
 To start the cluster up and connect to the NiFi desktop.
 
 1. Start the cluster with ``docker compose up -d``. The cluster will start 3 NiFi nodes to hold a proper election for master.
-1. Run ``./get-nifi-url.sh`` and note the URL that is returned. It will be something like *http\://localhost:\<port\>/nifi*.
+1. Run ``bin/get-nifi-url.sh`` and note the URL that is returned. It will be something like *http\://localhost:\<port\>/nifi*.
 1. Copy and paste that URL into your browser to connect to the NiFi desktop. On WSL you only need to hover over the URL and then *ctrl-click*.
 
 What the "get" script does is run ``docker compose port nifi 8080`` to get one of the port mappings for the NiFi service, then extracts the port part to create a URL.
@@ -40,7 +40,7 @@ What the "get" script does is run ``docker compose port nifi 8080`` to get one o
 $ docker compose port nifi 8080
 0.0.0.0:62142
 
-$ ./get-nifi-url.sh
+$ bin/get-nifi-url.sh
 http://localhost:62142/nifi
 ```
 
@@ -138,7 +138,7 @@ You can use the run command to also mount a local directory and then run any scr
 docker compose run --volume <path-to-mount>:<mount-point> kafka <mount-point>/<script-name>
 ```
 
-See the scripts *launch-script.sh* and *create-topics.sh* to see an example of how this is done.
+See the scripts *bin/launch-script.sh* and *bin/create-topics.sh* to see an example of how this is done.
 
 ## <a name="process"></a>Process Some Data
 
@@ -162,6 +162,8 @@ $ docker compose run kafka kafka-console-producer.sh \
 > ^D
 ```
 
+As this is so useful you can launch it with ``bin/launch-script.sh producer``.
+
 ### Receive Some Data
 
 ```
@@ -172,6 +174,7 @@ now is the time
 one is the number
 ^C
 ```
+As this is so useful you can launch it with ``bin/launch-script.sh consumer``.
 
 ## Stop
 
@@ -368,9 +371,35 @@ So, step one, try this ... and that was the answer.
 
 The archetype has some extra dependencies for the processor, and an example unit test class, so that will be adopted too.
 
-# Standard Processors
+## QueryRecord On Union Field
 
-Created a little task to convert a CSV file to JSON, then manipulate it. Using the "simple-traffic" sample files.
+With a schema like this
+
+```
+{
+  "type":"record",
+  "namespace":"blah",
+  "name":"SimpleTraffic",
+  "fields":[
+    {"name":"src_address","type":"string"},
+    {"name":"flag_s","type":["int","boolean"]}
+  ]
+}
+```
+
+and a record like this ``[{"src_address":"192.168.0.1","flag_s":true}]``, I want to filter out only those records which are true. So I create a QueryRecord and use this query ``select * from flowfile where flag_s = true``.
+
+But all I get is
+
+```
+org.apache.calcite.sql.validate.SqlValidatorException: Cannot apply '=' to arguments of type '<JAVATYPE(CLASS JAVA.LANG.OBJECT)> = <BOOLEAN>'.
+```
+
+Which looks to me like I cannot use a union type in a query. So I had to make a distinction between a raw and enriched schema and had to create new JSON reader and writer services.
+
+# Flow Experiment - Standard Processors
+
+Created a little task to convert a CSV file to JSON, then manipulate it. Start with the "simple-traffic" sample files. If there is a "failure" relationship in any of the processors then connect it to the log on failure process.
 
 ## Services
 
@@ -378,7 +407,7 @@ Create the following services.
 
 ### Avro Schema Registry
 
-Create a new parameter called "SimpleTraffic" and copy the file "simple-traffic.schema" into the value.
+Create new parameters called "raw-traffic" and "enriched-traffic". Copy the files "raw-traffic.schema" and "enriched-traffic.schema" respectively as the values.
 
 ### CSV Reader
 
@@ -386,47 +415,72 @@ Using the magic to enter a new line in record separator solved my initial proble
 
 * Schema Access Strategy = Use Schema Property Name
 * Schema Registry = Avro Schema Registry
-* Schema Name = ${schema.name}
+* Schema Name = ${schema.raw}
 * Record Separator = Shift+Enter
 * Value Separator = ,
 * Treat First Line As Header = false
 
 ### Json Record Set Writer
 
+Create two. Name one as "RawJsonRecordSetWriter" and the other "Enriched...".
+
 * Schema Access Strategy = Use Schema Property Name
 * Schema Registry = Avro Schema Registry
-* Schema Name = ${schema.name}
+* Schema Name = ${schema.raw} or ${schema.enriched}
 
 ### JSON Tree Reader
 
+Create two. Name one as "Raw..." and the other as "Enriched...".
+
 * Schema Access Strategy = Use Schema Property Name
 * Schema Registry = Avro Schema Registry
-* Schema Name = ${schema.name}
+* Schema Name = ${schema.raw} or ${schema.enriched}
 
 ## Processors
 
-Start with the Consume Kafka from the sample and end with the Publish Kafka and Log Message processors. Then put these in between.
+Start with the Consume Kafka from the sample and end with the Publish Kafka and Log Message processors. In the Consume Kafka service set the "Message Demarcator" to a newline by entering 'Shift+Enter'. Then put these new processors in between.
 
 ### UpdateAttribute
 
-Tell the flow which schema we are using.
+Tell the flow which schemas we are using.
 
-* schema.name = SimpleTraffic
+* schema.enriched = enriched-traffic
+* schema.raw = raw-traffic
 
 ### Convert Record
 
 Convert the CSV input records into the matching JSON schema.
 
 * Record Reader = CSVReader
-* Record Writer = JsonRecordSetWriter
+* Record Writer = RawJsonRecordSetWriter
 
 ### Update Record
 
-Change those 0 and 1 values for the flags to false or true respectively. Note that each parameter is a path to a field in the record and must start with "/".
+Change those 0 and 1 values for the flags to false or true respectively. Note that each parameter is a path to a field in the record and must start with "/". The reader here uses the raw schema but the writer converts the data to the enriched schema.
 
-* Record Reader = JsonTreeReader
-* Record Writer = JsonRecordSetWriter
+* Record Reader = RawJsonTreeReader
+* Record Writer = EnrichedJsonRecordSetWriter
 * Replacement Value Strategy = Literal Value
 * /flag_s = ${field.value:equals(1)}
 * /flag_a = ${field.value:equals(1)}
 * /flag_f = ${field.value:equals(1)}
+
+### Query Record
+
+Get rid of that useless record where TCP is set but there are no flags set. Create a QueryRecord processor, which allows queries written in [Calcite SQL](https://calcite.apache.org/docs/reference.html) to create new flows directed at new relationships.
+
+* Record Reader = EnrichedJsonTreeReader
+* Record Writer = EnrichedJsonRecordSetWriter
+* Include Zero Record FlowFiles = false
+* filtered = See below
+
+Connect the relationship "filtered" to the Kafka publisher. Select the relationship "original" to be terminated in the processor. Route "failure" to the error logger as all above.
+
+The query to use is
+
+```
+select *
+from flowfile
+where transport_protocol <> 6
+or (flag_s or flag_a or flag_f)
+```

@@ -1,0 +1,16 @@
+{
+  "type":"record",
+  "namespace":"io.github.hindmasj",
+  "name":"RawTraffic",
+  "fields":[
+    {"name":"src_address","type":"string"},
+    {"name":"src_port","type":"int"},
+    {"name":"dst_address","type":"string"},
+    {"name":"dst_port","type":"int"},
+    {"name":"ip_version","type":"int"},
+    {"name":"transport_protocol","type":"int"},
+    {"name":"flag_s","type":"int"},
+    {"name":"flag_a","type":"int"},
+    {"name":"flag_f","type":"int"}
+  ]
+}

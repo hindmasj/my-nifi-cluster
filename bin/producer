@@ -1,0 +1,2 @@
+kafka-console-producer.sh \
+--bootstrap-server kafka:9092 --topic my.source.topic
