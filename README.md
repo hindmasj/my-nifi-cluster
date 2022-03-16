@@ -399,6 +399,8 @@ Which looks to me like I cannot use a union type in a query. So I had to make a 
 
 # Flow Experiment - Standard Processors
 
+In order to ensure this flow works as documented you may need to checkout the [Simple Traffic Example tag (v1.0.0)](https://github.com/hindmasj/my-nifi-cluster/tree/v1.0.0) as some of the supporting files change to accommodate the later experiments.
+
 Created a little task to convert a CSV file to JSON, then manipulate it. Start with the "simple-traffic" sample files. If there is a "failure" relationship in any of the processors then connect it to the log on failure process.
 
 ## Services
