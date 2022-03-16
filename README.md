@@ -486,3 +486,89 @@ from flowfile
 where transport_protocol <> 6
 or (flag_s or flag_a or flag_f)
 ```
+
+# Flow Experiment - Convert To ECS
+
+Prior to working on an enrichment flow, this flow solves the problems of mapping the raw fields to a schema that is more complex. The idea is to make space in the schema for transformations and additions further downstream. Here the enriched schema tries to follow the [Elastic Common Schema](https://www.elastic.co/guide/en/ecs/current/index.html) guidelines. The [CSV of fields](https://github.com/elastic/ecs/blob/8.1/generated/csv/fields.csv) file is a useful quick lookup source.
+
+The enrichment process will seek to add more details about the transport protocol and the port services.
+
+## Schema Changes
+
+### Raw
+
+The union type (int or boolean) for each of the flags is restored, so that the Update Record process can fix up the flag values before going through the Jolt process.
+
+### Enriched
+
+A new enrichment schema is created, specifically for ECS compatibility.
+
+See the [Avro Specification](https://avro.apache.org/docs/current/spec.html) and this [stackoverflow article](https://stackoverflow.com/questions/43513140/avro-schema-format-exception-record-is-not-a-defined-name) for more information about nested schemas.
+
+The following mappings are made. The ECS recommendation to capitalise custom fields is used here.
+
+* src_address -> source.ip
+* src_address -> source.port
+* dst_address -> destination.ip
+* dst_port -> destination.port
+* ip_version -> network.type
+* transport_protocol -> network.iana_number
+* flag_s -> network.Flags.SYN
+* flag_a -> network.Flags.ACK
+* flag_f -> network.Flags.FIN
+
+This is captured in *ecs-enriched-traffic.schema*. Add it to the Avro Schema Registry as `ecs-enriched-traffic`. Change the Update Attribute processor to use the new schema by changing the value of *enriched.schema* to `ecs-enriched-traffic`.
+
+## Field Mapping
+
+### Update Record
+
+Change the JSON Tree writer from the enriched one to the raw one. Schema transformations are now carried out in Jolt. The flag transformation properties stay the same.
+
+### Jolt Transform
+
+Insert a Jolt transform between the update and the query. This processor turns each record from the raw schema format to the ECS enriched one.
+
+```
+[{
+	"operation": "shift",
+	"spec": {
+		"*": {
+			"src_address": "[&(1)].source.ip",
+			"src_port": "[&(1)].source.port",
+			"dst_address": "[&(1)].destination.ip",
+			"dst_port": "[&(1)].destination.port",
+			"ip_version": "[&(1)].network.type",
+			"transport_protocol": "[&(1)].network.iana_number",
+          	"flag_s": "[&(1)].network.Flags.SYN",
+          	"flag_a": "[&(1)].network.Flags.ACK",
+          	"flag_f": "[&(1)].network.Flags.FIN"
+		}
+	}
+},
+{
+   "operation":"modify-overwrite-beta",
+   "spec": {
+     "*": {
+       "network": {
+         "type": "=concat('ipv',@(0))"
+       }
+     }
+   }
+ }]
+```
+
+### Query Record
+
+Change the query to reflect the new schema. Each field now needs to use an RPath to find each field. Booleans also need to be cast as RPath returns a string.
+
+```
+select *
+from flowfile
+where rpath(network,'/iana_number') <> 6
+or cast(rpath(network,'/Flags/SYN') as boolean)
+or cast(rpath(network,'/Flags/ACK') as boolean)
+or cast(rpath(network,'/Flags/FIN') as boolean)
+```
+
+An alternative might have been to do the filter further up the flow when the content was still in the raw format, but then this would have hit upon the problem where the raw schema includes union types which Calcite cannot read. See in Issues section above.
