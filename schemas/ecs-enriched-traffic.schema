@@ -7,7 +7,9 @@
       "type":"record",
       "name":"source_schema",
       "fields":[
+        {"name":"address","type":"string"},
         {"name":"ip","type":"string"},
+        {"name":"Service","type":"string"},
         {"name":"port","type":"long"}
       ]}
     },
@@ -15,7 +17,9 @@
       "type":"record",
       "name":"destination_schema",
       "fields":[
+        {"name":"address","type":"string"},
         {"name":"ip","type":"string"},
+        {"name":"Service","type":"string"},
         {"name":"port","type":"long"}
       ]}
     },
@@ -23,8 +27,12 @@
       "type":"record",
       "name":"network_schema",
       "fields":[
+        {"name":"application","type":"string"},
+        {"name":"protocol","type":"string"},
         {"name":"type","type":{"type":"enum","name":"ip_version","symbols":["ipv4","ipv6"]}},
+        {"name":"Type_id","type":"long"},
         {"name":"iana_number","type":"long"},
+        {"name":"transport","type":"long"},
         {"name":"Flags","type":{
           "type":"record",
           "name":"Flags_schema",
