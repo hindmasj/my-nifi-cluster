@@ -582,3 +582,31 @@ or cast(rpath(network,'/Flags/FIN') as boolean)
 ```
 
 An alternative might have been to do the filter further up the flow when the content was still in the raw format, but then this would have hit upon the problem where the raw schema includes union types which Calcite cannot read. See in Issues section above.
+
+# Flow Experiment - Enrich From Redis
+
+See project [Redis-Client](https://github.com/hindmasj/redis-client) for details of how to set a simple Redis server. A Redis server instance has been added to this docker cluster to make the networking easier.
+
+Access the container CLI with ``docker compose exec redis redis-cli -a nifi_redis``.
+
+## Load Indices
+
+See the above project on how to create the files *protocols.output* and *services.output* which contain the required data. Upload these files with the following.
+
+```
+docker exec -i redis redis-cli -a nifi_redis --pipe < ../redis-client/services.output
+docker exec -i redis redis-cli -a nifi_redis --pipe < ../redis-client/protocols.output
+```
+
+Then test them like this.
+
+```
+docker exec -it redis redis-cli -a nifi_redis
+> get service.53/udp
+"{\"name\":\"domain\",\"code\":53,\"protocol\":\"udp\"}"
+
+> get protocol.6
+"{\"name\":\"tcp\",\"code\":6,\"alias\":\"TCP\",\"comment\":\"transmission control protocol\"}"
+
+> exit
+```

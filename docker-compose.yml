@@ -23,6 +23,14 @@ services:
       - 2181
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
+  redis:
+    hostname: redis
+    container_name: redis
+    image: bitnami/redis:latest
+    ports:
+      - 6379
+    environment:
+      - REDIS_PASSWORD=nifi_redis
   kafka:
     image: 'bitnami/kafka:latest'
     depends_on:
