@@ -507,15 +507,23 @@ See the [Avro Specification](https://avro.apache.org/docs/current/spec.html) and
 
 The following mappings are made. The ECS recommendation to capitalise custom fields is used here.
 
-* src_address -> source.ip
+* src_address -> source.ip & source.address
 * src_address -> source.port
-* dst_address -> destination.ip
+* dst_address -> destination.ip & destination.address
 * dst_port -> destination.port
-* ip_version -> network.type
+* ip_version -> network.type & network.Type_id
 * transport_protocol -> network.iana_number
 * flag_s -> network.Flags.SYN
 * flag_a -> network.Flags.ACK
 * flag_f -> network.Flags.FIN
+
+New fields that might be used later are also added, to see what the effect on processing is.
+
+* source.Service
+* destination.Service
+* network.application
+* network.protocol
+* network.transport
 
 This is captured in *ecs-enriched-traffic.schema*. Add it to the Avro Schema Registry as `ecs-enriched-traffic`. Change the Update Attribute processor to use the new schema by changing the value of *enriched.schema* to `ecs-enriched-traffic`.
 
@@ -534,11 +542,11 @@ Insert a Jolt transform between the update and the query. This processor turns e
 	"operation": "shift",
 	"spec": {
 		"*": {
-			"src_address": "[&(1)].source.ip",
+			"src_address": ["[&(1)].source.ip","[&(1)].source.address"],
 			"src_port": "[&(1)].source.port",
-			"dst_address": "[&(1)].destination.ip",
+			"dst_address": ["[&(1)].destination.ip","[&(1)].destination.address"],
 			"dst_port": "[&(1)].destination.port",
-			"ip_version": "[&(1)].network.type",
+			"ip_version": "[&(1)].network.Type_id",
 			"transport_protocol": "[&(1)].network.iana_number",
           	"flag_s": "[&(1)].network.Flags.SYN",
           	"flag_a": "[&(1)].network.Flags.ACK",
@@ -551,12 +559,14 @@ Insert a Jolt transform between the update and the query. This processor turns e
    "spec": {
      "*": {
        "network": {
-         "type": "=concat('ipv',@(0))"
+         "type": "=concat('ipv',@(1,Type_id))"
        }
      }
    }
  }]
 ```
+
+Note the kludge to convert IP version number to the type string.
 
 ### Query Record
 
