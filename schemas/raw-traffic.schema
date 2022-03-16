@@ -9,8 +9,8 @@
     {"name":"dst_port","type":"int"},
     {"name":"ip_version","type":"int"},
     {"name":"transport_protocol","type":"int"},
-    {"name":"flag_s","type":"int"},
-    {"name":"flag_a","type":"int"},
-    {"name":"flag_f","type":"int"}
+    {"name":"flag_s","type":["int","boolean"]},
+    {"name":"flag_a","type":["int","boolean"]},
+    {"name":"flag_f","type":["int","boolean"]}
   ]
 }
