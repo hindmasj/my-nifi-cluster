@@ -9,9 +9,15 @@
       "fields":[
         {"name":"address","type":"string"},
         {"name":"ip","type":"string"},
-        {"name":"Service","type":"string"},
         {"name":"port","type":"long"}
       ]}
+    },
+    {"name":"Source","type":{
+      "type":"record",
+      "name":"source_custom_schema",
+      "fields":[
+        {"name":"Service","type":"string"}
+        ]}
     },
     {"name":"destination","type":{
       "type":"record",
@@ -19,9 +25,15 @@
       "fields":[
         {"name":"address","type":"string"},
         {"name":"ip","type":"string"},
-        {"name":"Service","type":"string"},
         {"name":"port","type":"long"}
       ]}
+    },
+    {"name":"Destination","type":{
+      "type":"record",
+      "name":"destination_custom_schema",
+      "fields":[
+        {"name":"Service","type":"string"}
+        ]}
     },
     {"name":"network","type":{
       "type":"record",
@@ -30,16 +42,23 @@
         {"name":"application","type":"string"},
         {"name":"protocol","type":"string"},
         {"name":"type","type":{"type":"enum","name":"ip_version","symbols":["ipv4","ipv6"]}},
-        {"name":"Type_id","type":"long"},
         {"name":"iana_number","type":"long"},
-        {"name":"transport","type":"long"},
-        {"name":"Flags","type":{
+        {"name":"transport","type":"long"}
+      ]
+      }
+    },
+    {"name":"Network","type":{
+      "type":"record",
+      "name":"network_custom_schema",
+      "fields":[
+        {"name":"type_id","type":"long"},
+        {"name":"flags","type":{
           "type":"record",
-          "name":"Flags_schema",
+          "name":"tcp_flags_schema",
           "fields":[
-            {"name":"SYN","type":"boolean"},
-            {"name":"ACK","type":"boolean"},
-            {"name":"FIN","type":"boolean"}
+            {"name":"syn","type":"boolean"},
+            {"name":"ack","type":"boolean"},
+            {"name":"fin","type":"boolean"}
             ]}
           }
         ]

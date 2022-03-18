@@ -4,13 +4,13 @@
   "name":"RawTraffic",
   "fields":[
     {"name":"src_address","type":"string"},
-    {"name":"src_port","type":"int"},
+    {"name":"src_port","type":"long"},
     {"name":"dst_address","type":"string"},
-    {"name":"dst_port","type":"int"},
-    {"name":"ip_version","type":"int"},
-    {"name":"transport_protocol","type":"int"},
-    {"name":"flag_s","type":["int","boolean"]},
-    {"name":"flag_a","type":["int","boolean"]},
-    {"name":"flag_f","type":["int","boolean"]}
+    {"name":"dst_port","type":"long"},
+    {"name":"ip_version","type":"long"},
+    {"name":"transport_protocol","type":"long"},
+    {"name":"flag_s","type":"long"},
+    {"name":"flag_a","type":"long"},
+    {"name":"flag_f","type":"long"}
   ]
 }

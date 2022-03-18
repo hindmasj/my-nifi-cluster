@@ -518,7 +518,7 @@ The enrichment process will seek to add more details about the transport protoco
 
 ### Raw
 
-The union type (int or boolean) for each of the flags is restored, so that the Update Record process can fix up the flag values before going through the Jolt process.
+Each of the *int* fields were converted to *long* in line with ECS recommendations.
 
 ### Enriched
 
@@ -526,61 +526,77 @@ A new enrichment schema is created, specifically for ECS compatibility.
 
 See the [Avro Specification](https://avro.apache.org/docs/current/spec.html) and this [stackoverflow article](https://stackoverflow.com/questions/43513140/avro-schema-format-exception-record-is-not-a-defined-name) for more information about nested schemas.
 
-The following mappings are made. The ECS recommendation to capitalise custom fields is used here.
+The following mappings are made. The ECS recommendation to separate custom fields into their own field set, and capitalise the set name is used here.
 
 * src_address -> source.ip & source.address
 * src_address -> source.port
 * dst_address -> destination.ip & destination.address
 * dst_port -> destination.port
-* ip_version -> network.type & network.Type_id
+* ip_version -> network.type & Network.type_id
 * transport_protocol -> network.iana_number
-* flag_s -> network.Flags.SYN
-* flag_a -> network.Flags.ACK
-* flag_f -> network.Flags.FIN
+* flag_s -> Network.flags.syn
+* flag_a -> Network.flags.ack
+* flag_f -> Network.flags.fin
 
 New fields that might be used later are also added, to see what the effect on processing is.
 
-* source.Service
-* destination.Service
+* Source.service
+* Destination.service
 * network.application
 * network.protocol
 * network.transport
 
-This is captured in *ecs-enriched-traffic.schema*. Add it to the Avro Schema Registry as `ecs-enriched-traffic`. Change the Update Attribute processor to use the new schema by changing the value of *enriched.schema* to `ecs-enriched-traffic`.
+This is captured in *ecs-enriched-traffic.schema*. Add it to the Avro Schema Registry as `enriched-traffic`, replacing the old schema.
 
 ## Field Mapping
 
-### Update Record
+### Query Record
 
-Change the JSON Tree writer from the enriched one to the raw one. Schema transformations are now carried out in Jolt. The flag transformation properties stay the same.
+After discussion on the user forum it was tried to combine the format conversion (from CSV to JSON) and the filtering within a single QueryRecord processor.
+
+* RecordReader = CSVReader
+* RecordWriter = InheritJsonRecordSetWriter
+* Include Zero Record FlowFiles = false
+* filtered = See below
+
+```
+select *
+from flowfile
+where transport_protocol <> 6
+or flag_s = 1 or flag_a = 1 or flag_f =1
+```
 
 ### Jolt Transform
 
-Insert a Jolt transform between the update and the query. This processor turns each record from the raw schema format to the ECS enriched one.
+Insert a Jolt transform after the query. This processor turns each record from the raw schema format to the ECS enriched one.
 
 ```
 [{
-	"operation": "shift",
-	"spec": {
-		"*": {
-			"src_address": ["[&(1)].source.ip","[&(1)].source.address"],
-			"src_port": "[&(1)].source.port",
-			"dst_address": ["[&(1)].destination.ip","[&(1)].destination.address"],
-			"dst_port": "[&(1)].destination.port",
-			"ip_version": "[&(1)].network.Type_id",
-			"transport_protocol": "[&(1)].network.iana_number",
-          	"flag_s": "[&(1)].network.Flags.SYN",
-          	"flag_a": "[&(1)].network.Flags.ACK",
-          	"flag_f": "[&(1)].network.Flags.FIN"
-		}
-	}
-},
-{
+  "operation": "shift",
+  "spec": {
+    "*": {
+      "src_address": ["[&(1)].source.ip","[&(1)].source.address"],
+      "src_port": "[&(1)].source.port",
+      "dst_address": ["[&(1)].destination.ip","[&(1)].destination.address"],
+      "dst_port": "[&(1)].destination.port",
+      "ip_version": ["[&(1)].network.type","[&(1)].Network.type_id"],
+      "transport_protocol": "[&(1)].network.iana_number",
+      "flag_s": "[&(1)].Network.flags.syn",
+      "flag_a": "[&(1)].Network.flags.ack",
+      "flag_f": "[&(1)].Network.flags.fin"
+    }
+  }
+}, {
    "operation":"modify-overwrite-beta",
    "spec": {
      "*": {
        "network": {
-         "type": "=concat('ipv',@(1,Type_id))"
+         "type": "=concat('ipv',@(0))"
+       },
+       "Network": {
+         "flags": {
+           "*": "=elementAt(@(0),false,true)"
+         }
        }
      }
    }
@@ -589,9 +605,9 @@ Insert a Jolt transform between the update and the query. This processor turns e
 
 Note the kludge to convert IP version number to the type string.
 
-### Query Record
+*Historical Note*
 
-Change the query to reflect the new schema. Each field now needs to use an RPath to find each field. Booleans also need to be cast as RPath returns a string.
+The filtering of the flags was at one time done after the Jolt in a query. The query is preserved here as a working example of using RPath in a query.
 
 ```
 select *
@@ -601,8 +617,6 @@ or cast(rpath(network,'/Flags/SYN') as boolean)
 or cast(rpath(network,'/Flags/ACK') as boolean)
 or cast(rpath(network,'/Flags/FIN') as boolean)
 ```
-
-An alternative might have been to do the filter further up the flow when the content was still in the raw format, but then this would have hit upon the problem where the raw schema includes union types which Calcite cannot read. See in Issues section above.
 
 # Flow Experiment - Enrich From Redis
 
