@@ -397,6 +397,14 @@ org.apache.calcite.sql.validate.SqlValidatorException: Cannot apply '=' to argum
 
 Which looks to me like I cannot use a union type in a query. So I had to make a distinction between a raw and enriched schema and had to create new JSON reader and writer services.
 
+Tried a cast but I get this error.
+
+```
+org.apache.calcite.sql.validate.SqlValidatorException: Cast function cannot convert value of type JavaType(class java.lang.Object) to type BOOLEAN
+```
+
+**TIP**: To get at recent error messages have a look at the bulletin board API: ``http://<host>:<port>/nifi-api/flow/bulletin-board``.
+
 # Flow Experiment - Standard Processors
 
 In order to ensure this flow works as documented you may need to checkout the [Simple Traffic Example tag (v1.0.0)](https://github.com/hindmasj/my-nifi-cluster/tree/v1.0.0) as some of the supporting files change to accommodate the later experiments.
@@ -486,6 +494,19 @@ from flowfile
 where transport_protocol <> 6
 or (flag_s or flag_a or flag_f)
 ```
+
+# Flow Experiment - Use Tab Separation
+
+Using the file *samples/simple-traffic-array.tsv* to demonstrate that a TSV file can be handled just as easily as CSV.
+
+Create a new CSVReader, but call it "TSVReader". Give it the following properties.
+
+* Schema Access Strategy = Use Schema Property Name
+* Schema Registry = Avro Schema Registry
+* Schema Name = ${schema.raw}
+* CSV Format = Tab-Delimited
+
+Now configure the ConvertRecord processor to use this new reader and now tab-separated files will processed in the same manner as CSV.
 
 # Flow Experiment - Convert To ECS
 
