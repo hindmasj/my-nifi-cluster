@@ -405,6 +405,55 @@ org.apache.calcite.sql.validate.SqlValidatorException: Cast function cannot conv
 
 **TIP**: To get at recent error messages have a look at the bulletin board API: ``http://<host>:<port>/nifi-api/flow/bulletin-board``.
 
+**Solution**: See the flow in section [Flow Experiment - Convert To ECS](#flow-experiment-convert-to-ecs). There are 2 processors: a QueryRecord to filter and convert from CSV to JSON, and a JoltTransformJSON to fix up the boolean flags and change the schema.
+
+## <a name="redis-lookup-returns-string"></a>Redis Lookup Only Returns String
+
+So I can create a Redis record using the pipe protocol.
+
+```
+*3
+$3
+SET
+$10
+protocol.6
+$79
+{"name":"tcp","code":6,"alias":"TCP","comment":"transmission control protocol"}
+```
+
+which in Redis looks like this.
+
+```
+get protocol.6
+"{\"name\":\"tcp\",\"code\":6,\"alias\":\"TCP\",\"comment\":\"transmission control protocol\"}"
+```
+
+When I retrieve the string, it gets treated like a string, not a record.
+
+```
+"Enrichment" : {
+  "Network" : {
+    "Transport" : "{\"name\":\"tcp\",\"code\":6,\"alias\":\"TCP\",\"comment\":\"transmission control protocol\"}"
+  }
+}
+```
+
+If I try to unencode it with an UpdateRecord it gets transformed into a string.
+
+```
+/Enrichment/Network/transport = unescapeJson(/Enrichment/Network/Transport)
+```
+
+```
+"Enrichment" : {
+  "Network" : {
+    "iana_number" : 6,
+    "Transport" : "{\"name\":\"tcp\",\"code\":6,\"alias\":\"TCP\",\"comment\":\"transmission control protocol\"}",
+    "transport" : "{name=tcp, code=6, alias=TCP, comment=transmission control protocol}"
+  }
+}
+```
+
 # Flow Experiment - Standard Processors
 
 In order to ensure this flow works as documented you may need to checkout the [Simple Traffic Example tag (v1.0.0)](https://github.com/hindmasj/my-nifi-cluster/tree/v1.0.0) as some of the supporting files change to accommodate the later experiments.
@@ -508,7 +557,7 @@ Create a new CSVReader, but call it "TSVReader". Give it the following propertie
 
 Now configure the ConvertRecord processor to use this new reader and now tab-separated files will processed in the same manner as CSV.
 
-# Flow Experiment - Convert To ECS
+# <a name="flow-experiment-convert-to-ecs"></a>Flow Experiment - Convert To ECS
 
 Prior to working on an enrichment flow, this flow solves the problems of mapping the raw fields to a schema that is more complex. The idea is to make space in the schema for transformations and additions further downstream. Here the enriched schema tries to follow the [Elastic Common Schema](https://www.elastic.co/guide/en/ecs/current/index.html) guidelines. The [CSV of fields](https://github.com/elastic/ecs/blob/8.1/generated/csv/fields.csv) file is a useful quick lookup source.
 
@@ -645,3 +694,99 @@ docker exec -it redis redis-cli -a nifi_redis
 
 > exit
 ```
+
+## Services
+
+### RedisConnectionPoolService
+
+Note you will have to insert the password every time you down/up the cluster.
+
+* Redis Mode = Standalone
+* Conection String = redis:6379
+* Database Index = 0
+* Password = nifi_redis
+
+### RedisDistributionMapCacheClientService
+
+* Redis Connection Pool = RedisConnectionPoolService
+* TTL = 300 secs
+
+### DistributedMapCacheLookupService
+
+* Distributed Cache Service  = RedisDistributionMapCacheClientService
+* Character Encoding = UTF-8
+
+## Processors
+
+### JoltTransformJSON
+
+Create space in the record to put the enriched data by adding this to the modify-overwrite spec.
+
+```
+{
+   "operation":"modify-overwrite-beta",
+   "spec": {
+     "*": {
+       ...,
+       "Enrichment": {
+         "Network": {
+           "Transport": null
+         }
+       }
+     }
+   }
+ }
+```
+
+### LookupRecord
+
+* RecordReader = InferJsonTreeReader
+* RecordWriter = InheritJsonRecordSetWriter
+* Lookup Service = DistributedMapCacheLookupService
+* Result RecordPath = /Enrichment/Network/Transport
+* Routing Strategy = Route To Success
+* Record Result Contents = Insert Entire Record
+* Record Update Strategy = Use Property
+* key = concat('protocol.',/network/iana_number)
+
+### JoltTransformJSON
+
+A second transform to make sense of the result.
+
+```
+[{
+  "operation": "shift",
+  "spec": {
+    "*": {
+      "Enrichment":{
+        "Network": {
+          "Transport": {
+            "name": "[&(4)].network.transport"
+          }
+        }
+      },
+      "*": "[&(1)].&"
+    }
+  }
+}]
+```
+
+Sadly this does not work. See issues above.
+
+### UpdateRecord
+
+Trying an update instead of a Jolt, to parse the result string with a regex.
+
+* RecordReader = InferJsonTreeReader
+* RecordWriter = InheritJsonRecordSetWriter
+* Replacement Value Strategy = Record Path Value
+* /network/transport =
+```
+replaceRegex(
+  unescapeJson(/Enrichment/Network/Transport),
+  '\{name=([^,]+),.*\}',
+  '$1'
+)
+```
+
+This works but it is a bit of a kludge, having to decode the result with a regex.
