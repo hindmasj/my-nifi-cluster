@@ -1,0 +1,57 @@
+[{
+	"source": {
+		"ip": "192.168.0.1",
+		"address": "192.168.0.1",
+		"port": 12977
+	},
+	"destination": {
+		"ip": "192.168.0.2",
+		"address": "192.168.0.2",
+		"port": 80
+	},
+	"network": {
+		"type": "ipv4",
+		"iana_number": 6
+	},
+	"Network": {
+		"type_id": 4,
+		"flags": {
+			"syn": true,
+			"ack": true,
+			"fin": true
+		}
+	},
+	"Enrichment": {
+		"Network": {
+			"Transport": "{\"name\":\"tcp\",\"code\":6,\"alias\":\"TCP\",\"comment\":\"transmission control protocol\"}"
+		}
+	}
+}, {
+  "source" : {
+    "ip" : "192.168.2.1",
+    "address" : "192.168.2.1",
+    "port" : 21799
+  },
+  "destination" : {
+    "ip" : "192.168.2.2",
+    "address" : "192.168.2.2",
+    "port" : 53
+  },
+  "network" : {
+    "type" : "ipv4",
+    "iana_number" : 17
+  },
+  "Network" : {
+    "type_id" : 4,
+    "flags" : {
+      "syn" : false,
+      "ack" : false,
+      "fin" : false
+    }
+  },
+  "Enrichment" : {
+    "Network" : {
+      "Transport" : "{\"name\":\"udp\",\"code\":17,\"alias\":\"UDP\",\"comment\":\"user datagram protocol\"}"
+    }
+  }
+}]
