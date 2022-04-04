@@ -682,10 +682,10 @@ docker exec -i redis redis-cli -a nifi_redis --pipe < ../redis-client/services.o
 docker exec -i redis redis-cli -a nifi_redis --pipe < ../redis-client/protocols.output
 ```
 
-Then test them like this.
+Then test them like this. (Note new command ``bin/redis-client.sh`` to launch a client.)
 
 ```
-docker exec -it redis redis-cli -a nifi_redis
+bin/redis-client.sh
 > get service.53/udp
 "{\"name\":\"domain\",\"code\":53,\"protocol\":\"udp\"}"
 
