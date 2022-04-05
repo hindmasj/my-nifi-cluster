@@ -731,14 +731,26 @@ Create space in the record to put the enriched data by adding this to the modify
        "Enrichment": {
          "Network": {
            "Transport": null
+         },
+         "Source": {
+           "Service": null
+         },
+         "Destination": {
+           "Service": null
          }
+       },
+       "Source": {
+         "service": null
+       },
+       "Destination": {
+         "service": null
        }
      }
    }
- }
+ }]
 ```
 
-### LookupRecord
+### LookupRecord - Transport
 
 * RecordReader = InferJsonTreeReader
 * RecordWriter = InheritJsonRecordSetWriter
@@ -773,7 +785,7 @@ A second transform to make sense of the result.
 
 Sadly this does not work. See issues above.
 
-### UpdateRecord
+### UpdateRecord - Transport
 
 Trying an update instead of a Jolt, to parse the result string with a regex.
 
@@ -790,3 +802,38 @@ replaceRegex(
 ```
 
 This works but it is a bit of a kludge, having to decode the result with a regex.
+
+### LookupRecord - Service
+
+Now we have the transport protocol name we can look up the service name.
+
+This needs two LookupService processors, one for the source and one for the destination.
+
+Copy the previous lookup and change the following, replacing source with destination as required:-
+
+* Result RecordPath = /Enrichment/Source/Service
+* key = concat('service.',/source/port,'/',/network/transport)
+
+
+### UpdateRecord - Service
+
+This can copy the service values to the right places. Copy the previous UpdateRecord, delete update config and add these two.
+
+* /Source/service =
+```
+replaceRegex(
+  unescapeJson(/Enrichment/Source/Service),
+  '\{name=([^,]+),.*\}',
+  '$1'
+)
+```
+* /Destination/service =
+```
+replaceRegex(
+  unescapeJson(/Enrichment/Destination/Service),
+  '\{name=([^,]+),.*\}',
+  '$1'
+)
+```
+
+This places the enriched values in the places required, but has some rough edges and seems overly complex. This completed flow has been saved as a template "JSON_Redis_Enrichment.xml" together with the very simple error handling template "Error_Handling.xml".
