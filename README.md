@@ -706,14 +706,14 @@ Note you will have to insert the password every time you down/up the cluster.
 * Database Index = 0
 * Password = nifi_redis
 
-### RedisDistributionMapCacheClientService
+### RedisDistributedMapCacheClientService
 
 * Redis Connection Pool = RedisConnectionPoolService
 * TTL = 300 secs
 
 ### DistributedMapCacheLookupService
 
-* Distributed Cache Service  = RedisDistributionMapCacheClientService
+* Distributed Cache Service  = RedisDistributedMapCacheClientService
 * Character Encoding = UTF-8
 
 ## Processors
