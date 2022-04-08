@@ -5,7 +5,7 @@
 
 Prior to working on an enrichment flow, this flow solves the problems of mapping the raw fields to a schema that is more complex. The idea is to make space in the schema for transformations and additions further downstream. Here the enriched schema tries to follow the [Elastic Common Schema](https://www.elastic.co/guide/en/ecs/current/index.html) guidelines. The [CSV of fields](https://github.com/elastic/ecs/blob/8.1/generated/csv/fields.csv) file is a useful quick lookup source.
 
-The enrichment process will seek to add more details about the transport protocol and the port services.
+The [enrichment process](experiment-enrich_from_redis.md) seeks to add more details about the transport protocol and the port services.
 
 ## Schema Changes
 

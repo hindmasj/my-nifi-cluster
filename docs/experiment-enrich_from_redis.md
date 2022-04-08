@@ -169,7 +169,7 @@ replaceRegex(
 )
 ```
 
-This places the enriched values in the places required, but has some rough edges and seems overly complex. This completed flow has been saved as a template "JSON_Redis_Enrichment.xml" together with the very simple error handling template "Error_Handling.xml".
+This places the enriched values in the places required, but has some rough edges and seems overly complex. This completed flow has been saved as a template "flow_templates/JSON_Redis_Enrichment.xml" together with the very simple error handling template "flow_templates/Error_Handling.xml".
 
 ---
 ### [Home](../README.md) | [Up](experiments.md) | [Prev (Convert To ECS)](experiment-convert_to_ecs.md)
