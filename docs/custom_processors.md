@@ -1,3 +1,6 @@
+### [Home (README.md)](../README.md)
+---
+
 # Custom Processors
 
 See the [NiFi Admin Guide](https://nifi.apache.org/docs/nifi-docs/html/administration-guide.html#processor-locations) for details of where to put custom processor NARs. See the "Issues" section further down to see discussion of what has been done.
@@ -21,3 +24,6 @@ docker compose restart nifi
 There is a maven project included which creates a very simple processor which just add the phrase "APPROVED" to the end of any message it sees in the flow.
 
 Build the project with ``mvn clean package`` and this produces a NAR file *archiver/target/nifi-hindmasj-processors-&lt;version&gt;.nar* which can then be loaded into the cluster as outlined above.
+
+---
+### [Home (README.md)](../README.md)
