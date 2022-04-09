@@ -1,0 +1,4 @@
+[
+  {"enrichment-type":"asset_ip","enrichment-key":"192.168.0.1","hostname":"bob","mac":"aa:bb:cc:11:22:33","location":"site 1"},
+  {"enrichment-type":"asset_ip","enrichment-key":"192.168.0.2","hostname":"fred","mac":"aa:bb:cc:33:22:11","location":"site 2"}
+]

@@ -7,7 +7,7 @@ BOOTSTRAP=${SERVICE}:${PORT}
 RETAIN=36000000
 REPLIC=3
 
-for topic in source sink
+for topic in source sink enrichment
 do
   kafka-topics.sh --bootstrap-server ${BOOTSTRAP} \
     --create --topic my.${topic}.topic \

@@ -1,0 +1,4 @@
+[
+  {"enrichment-type":"threat_ip","enrichment-key":"10.1.1.1","threat":"malware","risk":5,"Source":"malware index"},
+  {"enrichment-type":"threat_ip","enrichment-key":"10.2.1.1","threat":"phishing","risk":7,"Source":"phish index"}
+]
