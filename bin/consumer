@@ -1,4 +1,8 @@
+TOPIC=${1:-my.source.topic}
+
+echo Consuming from ${TOPIC}
+
 kafka-console-consumer.sh \
   --bootstrap-server kafka:9092 \
-  --topic my.sink.topic \
+  --topic ${TOPIC} \
   --offset earliest --partition 0

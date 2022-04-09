@@ -1,2 +1,6 @@
+TOPIC=${1:-my.source.topic}
+
+echo Producing to ${TOPIC}
+
 kafka-console-producer.sh \
---bootstrap-server kafka:9092 --topic my.source.topic
+--bootstrap-server kafka:9092 --topic ${TOPIC}

@@ -27,10 +27,10 @@ Create this flow to write the JSON messages to Redis
 
 ### ConsumeKafka
 
-Copy the consumer processor from previous experiments and make these changes.
+Copy the consumer processor from previous experiments and make these changes. In this case as the messages are whole JSON arrays then there is no message demarcator.
 
 * Topic Name(s) = my.enrichment.topic
-* Message Demarcator = , (a comma)
+* Message Demarcator = (Tick "Set Empty String")
 
 ### SplitRecord
 
@@ -49,12 +49,32 @@ Auto terminate the "unmatched" relationship. Again, should be properly handled i
 * Destination = flowfile-attribute
 * Return Type = auto-detect
 * Path Not Found Behaviour = warn
-* index-prefix = /enrichment-type
-* index-key = /enrichment-key
+* index-prefix = enrichment-type
+* index-key = enrichment-key
 
 ### PutDistributedMapCache
 
+* Cache Entry Identifier = ${index-prefix:append('/'):append(${index-key})}
+* Distributed Cache Service = RedisDistributedMapCacheClientService
+* Cache Update Strategy = Replace If Present
 
+### LogAttribute
+
+Finish off the flow by logging each write. Auto terminate "success".
+
+* Log Level = Info
+* Log Payload = false
+* Attributes To Log by Regular Expression = index-.*
+* Log prefix = Enrichment data written to Redis
+
+## Test The Write Flow
+
+1. Start the processors you wish to observe.
+1. Open a new producer for the enrichment topic with ``bin/launch-script.sh producer my.enrichment.topic``.
+1. Paste the samples files "samples/asset-source.json" and "threat-source.json" into the producer.
+1. Start a redis console with ``bin/redis-client.sh ``.
+1. Check that the expected keys have been written with ``keys *``.
+1. Observe the written values, eg ``get  threat_ip/10.2.1.1``.
 
 ## Enriching Flow
 
