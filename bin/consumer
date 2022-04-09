@@ -1,6 +1,7 @@
 TOPIC=${1:-my.source.topic}
 
 echo Consuming from ${TOPIC}
+echo
 
 kafka-console-consumer.sh \
   --bootstrap-server kafka:9092 \

@@ -89,8 +89,49 @@ A simple flow to observe how the enrichment data might work. Start with the JSON
 
 You can delete the AvroSchemaRegistry and CSVReader services.
 
-Delete the first UpdateAttribute and QueryRecord processors
+Delete the first JoltTransformJSON, UpdateAttribute and QueryRecord processors. Delete all but the first LookupRecord and UpdateRecord processors.
 
+### ConsumeKafka
+
+The incoming samples this time are individual JSON records. Make sure the message demarcator is still ``<shift>+<enter>``.
+
+### JoltTransformRecord
+
+Use this transform to create the enrichment save point. It also converts the separate records in the payload into a single JSON array, which is what the other transforms are expecting.
+
+* Record Reader = InferJsonTreeReader
+* RecordWriter = InheritJsonRecordSetWriter
+* Jolt Specification =
+```
+[{
+  "operation":"modify-overwrite-beta",
+  "spec": {
+    "Enrichment": {}
+  }
+}]
+```
+
+### LookupRecord
+
+There are now several lookup records to do each of the enrichment lookups. Create them with the following key and result path values. Create the first one by adapting the first LookupRecord from the template and then copy, paste and edit.
+
+| Name | Key | Result RecordPath
+|:--|:--|:--
+| src asset | concat('asset_ip/',/src_address) | /Enrichment/src_asset
+| dst asset | concat('asset_ip/',/dst_address) | /Enrichment/dst_asset
+| src threat | concat('threat_ip/',/src_address) | /Enrichment/threat
+| dst threat | concat('threat_ip/',/dst_address) | /Enrichment/threat
+
+Notice there is only one landing point for threat data. This is to test an edge case I am interested in. The other configuration values are the same for each.
+
+* RecordReader = InferJsonTreeReader
+* RecordWriter = InheritJsonRecordSetWriter
+* Lookup Service = DistributedMapCacheLookupService
+* Result RecordPath = (see table)
+* Routing Strategy = Route To Success
+* Record Result Contents = Insert Entire Record
+* Record Update Strategy = Use Property
+* key = (see table)
 
 ---
 ### [Home](../README.md) | [Up](experiments.md) | [Prev (Enrich From Redis)](experiment-enrich_from_redis.md)
