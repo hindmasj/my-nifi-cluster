@@ -71,12 +71,26 @@ Finish off the flow by logging each write. Auto terminate "success".
 
 1. Start the processors you wish to observe.
 1. Open a new producer for the enrichment topic with ``bin/launch-script.sh producer my.enrichment.topic``.
-1. Paste the samples files "samples/asset-source.json" and "threat-source.json" into the producer.
+1. Paste the samples files "samples/asset-source.json" and "samples/threat-source.json" into the producer.
 1. Start a redis console with ``bin/redis-client.sh ``.
 1. Check that the expected keys have been written with ``keys *``.
 1. Observe the written values, eg ``get  threat_ip/10.2.1.1``.
 
 ## Enriching Flow
+
+A simple flow to observe how the enrichment data might work. Start with the JSON test bed flow and fork it.
+
+1. Copy and paste the test bed flow.
+1. Right click "Version" > "Stop Version Control".
+1. Open configuration and change the name to "Redis Enrichment Test Bed".
+1. Start version control again under a new name.
+
+### Delete These
+
+You can delete the AvroSchemaRegistry and CSVReader services.
+
+Delete the first UpdateAttribute and QueryRecord processors
+
 
 ---
 ### [Home](../README.md) | [Up](experiments.md) | [Prev (Enrich From Redis)](experiment-enrich_from_redis.md)
