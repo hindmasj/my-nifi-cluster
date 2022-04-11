@@ -3,6 +3,8 @@
 
 # Issues
 
+# Installation
+
 ## Update Sensitive Key
 
 Need to create a random key and set it as the sensitive key. This is a new requirement for NiFi from 1.14.0.
@@ -56,9 +58,9 @@ git init flow_storage
 chown -R 1000.1000 flow_storage
 ```
 
-## Custom Processors
+# Custom Processors
 
-### Loading The Processor
+## Loading The Processor
 
 As the NiFi process has already started by the time you get to copy a file to the lib directory, I needed to find a way to copy the NAR file in and have it picked up by the JVM without restarting the cluster.
 
@@ -84,7 +86,7 @@ No, it was because it was not being copied to all containers. You have to use ``
 1. If you need to overwrite the file then the class loaders will not load same classes again. In this case you need to restart the NiFi service, **after** the copy, with ``docker compose restart nifi``.
 1. If you are going to do a restart anyway then you do other things, like load a new config file or push the NAR file to the lib directory.
 
-### Indexing The Processor
+## Indexing The Processor
 
 As it first appeared in the index of processors, my custom processor did not have a domain name or version number when it appeared in the list.
 
@@ -136,6 +138,8 @@ The archiver POM does not refer to the *nifi-nar-maven-plugin* plugin, but inher
 So, step one, try this ... and that was the answer.
 
 The archetype has some extra dependencies for the processor, and an example unit test class, so that will be adopted too.
+
+# Flows
 
 ## QueryRecord On Union Field
 
@@ -221,6 +225,68 @@ If I try to unencode it with an UpdateRecord it gets transformed into a string.
 ```
 
 So the issue is, how can this string be converted to JSON? Either it needs some complex regexes, or a custom processor beckons.
+
+## Lookup Ignores All If First Record Not Matched
+
+See the flow setup in [Writing To Redis](experiment-write_to_redis.md).
+
+Create a simple lookup record processor.
+
+* Result RecordPath = /mood
+* Routing Strategy = Route To Success
+* key = concat('mood/',name)
+
+Create a sample flow file.
+
+```
+[{"name":"fred"},{"name":"bill"},{"name":"charlie"}]
+```
+
+Create these keys.
+
+```
+set mood/fred happy
+set mood/charlie sad
+```
+
+Result is
+
+```
+[{"name":"fred","mood":"happy"},{"name":"bill","mood":null},{"name":"charlie","mood":"sad"}]
+```
+
+Now try this flow.
+
+```
+[{"name":"bill"},{"name":"fred"},{"name":"charlie"}]
+```
+
+Result
+
+```
+[{"name":"bill"},{"name":"fred"},{"name":"charlie"}]
+```
+
+Oops, where did my lookups go?
+
+Add this key.
+
+```
+set mood/bill neutral
+```
+
+Result is
+```
+[{"name":"bill","mood":"neutral"},{"name":"fred","mood":"happy"},{"name":"charlie","mood":"sad"}]
+```
+
+Change the routing strategy to "Route to matched or unmatched", unset that key for Bill, and try again.
+
+```
+matched queue -> [{"name":"fred","mood":"happy"},{"name":"charlie","mood":"sad"}]
+
+unmatched queue -> [{"name":"bill"}]
+```
 
 ---
 ### [Home (README.md)](../README.md)
