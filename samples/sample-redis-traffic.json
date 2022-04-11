@@ -7,3 +7,4 @@
 {"src_address":"10.1.1.1","src_port":12911,"dst_address":"192.168.0.1","dst_port":80,"ip_version":4,"transport_protocol":6}
 {"src_address":"10.2.1.1","src_port":12912,"dst_address":"192.168.0.2","dst_port":80,"ip_version":4,"transport_protocol":6}
 {"src_address":"10.1.1.1","src_port":12913,"dst_address":"10.2.1.1","dst_port":80,"ip_version":4,"transport_protocol":6}
+{"src_address":"10.2.1.1","src_port":12913,"dst_address":"10.1.1.1","dst_port":80,"ip_version":4,"transport_protocol":6}

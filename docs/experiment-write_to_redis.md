@@ -128,10 +128,97 @@ Notice there is only one landing point for threat data. This is to test an edge 
 * RecordWriter = InheritJsonRecordSetWriter
 * Lookup Service = DistributedMapCacheLookupService
 * Result RecordPath = (see table)
-* Routing Strategy = Route To Success
+* Routing Strategy = Route To Matched/Unmatched
 * Record Result Contents = Insert Entire Record
 * Record Update Strategy = Use Property
 * key = (see table)
+
+See the explanation under [Lookup Ignores All If First Record Not Matched](issues.md#lookup_ignores) for an explanation of why we need to use the "matched/unmatched" routing strategy. For each processor connect both the matched and unmatched relationships to the next processor.
+
+Note during processing that the single input flow file gets fragmented as the individual records get filtered between the different matched and unmatched routes.
+
+### MergeRecord
+
+An attempt to defragment the flowfiles post lookup. In fact this will not work as the JSON readers and writers will not be able to agree on what is a similar record.
+
+Auto terminate the "original" relationship.
+
+* RecordReader = InferJsonTreeReader
+* RecordWriter = InheritJsonRecordSetWriter
+* Merge Strategy = Defragment
+* Correlation Attribute = kafka.topic
+
+So, do not use, but added here for explanation.
+
+### UpdateRecord
+
+There is one UpdateRecord processor required to process the captured data into the correct fields.
+
+It consists of number of rules each with a result path and source function. The source functions all take the form:
+
+```
+replaceRegex(
+  unescapeJson(<source record>),
+  '^.*<source field>=([^,}]+)[,}].*$',
+  '$1'
+)
+```
+
+The rules are
+
+| Parameter (result path) | Source Record | Source Field
+|:--|:--|:--
+| /device_src_hostname | /Enrichment/src_asset | hostname
+| /device_src_mac_addr | /Enrichment/src_asset | mac
+| /device_src_location_location | /Enrichment/src_asset | location
+| /device_dst_hostname | /Enrichment/dst_asset | hostname
+| /device_dst_mac_addr | /Enrichment/dst_asset | mac
+| /device_dst_location_location | /Enrichment/dst_asset | location
+| /threat_type | /Enrichment/threat | threat
+| /threat_risk_level | /Enrichment/threat | risk
+| /threat_source | /Enrichment/threat | Source
+
+For example, the value for the rule "/device_src_hostname" is
+
+```
+replaceRegex(
+  unescapeJson(/Enrichment/src_asset),
+  '^.*hostname=([^,}]+)[,}].*$',
+  '$1'
+)
+```
+
+The other configuration parameters are
+
+* RecordReader = InferJsonTreeReader
+* RecordWriter = InheritJsonRecordSetWriter
+* Replacement Value Strategy = Record Path Value
+
+### JoltTransformJSON
+
+Delete the "Enrichment" temporary location.
+
+Set "Pretty Print" to "True" get easier to read output.
+
+```
+[{
+  "operation": "remove",
+  "spec": {
+    "*": {
+      "Enrichment": ""
+    }
+  }
+}]
+```
+
+## Results
+
+So the things to note are:-
+
+* By the time all the lookups have happened, our original one flow is now 5.
+* When both ends are internal the asset information gets added and the threat information is null.
+* When both ends are external, the threat information is added and the destination based information always wins as it is the second to be looked up.
+* When only one end is external then that threat data is preserved.
 
 ---
 ### [Home](../README.md) | [Up](experiments.md) | [Prev (Enrich From Redis)](experiment-enrich_from_redis.md)

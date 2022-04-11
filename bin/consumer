@@ -1,4 +1,4 @@
-TOPIC=${1:-my.source.topic}
+TOPIC=${1:-my.sink.topic}
 
 echo Consuming from ${TOPIC}
 echo
