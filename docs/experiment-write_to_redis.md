@@ -11,6 +11,8 @@ It will write two types of enrichment data to the index, and both the prefix and
 
 Create an error handling output port to connect any failure relationships to and send to the error handling process group.
 
+Both of the flows created here have been saved as templates in "flow_templates/Write_To_Redis.xml" and "flow_templates/Redis_Enrichment.xml".
+
 ## Services
 
 Create the following services, based on guides from [Enrich From Redis](experiment-enrich_from_redis.md).
