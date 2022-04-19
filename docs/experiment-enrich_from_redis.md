@@ -39,7 +39,7 @@ Note you will have to insert the password every time you down/up the cluster.
 * Database Index = 0
 * Password = nifi_redis
 
-**Side Note**: Setting the Redis password in a Parameter Context.
+**Side Note**: Setting the Redis configuration in a Parameter Context.
 
 To demonstrate the use of parameter contexts, create a new parameter context from the site hamburger menu -> Parameter Contexts, and give it a name like "RedisConfig".
 
@@ -52,6 +52,14 @@ Create a new parameter.
 Now open the "Configure" menu for the process group. On the "General" tab, select the "RedisConfig" parameter context from the drop down under "Process Group Parameter Context".
 
 Now switch to the "Controller Services" tab. In the RedisConnectionPoolService, set the value of "Password" to "#{RedisPassword}".
+
+Repeat for a parameter RedisConnectionString.
+
+* Name = RedisConnectionString
+* Value = redis:6379
+* Sensitive Value = No
+
+Note that now the parameter context is associated with the process group, whenever the group is imported from the registry it will be created in the NiFi instance with inherited values. However if the context already exists the values will be preserved if the group is imported later. This allows site specific environments to be created, while the correct structure for holding that environment and associating it with the correct process group can be version controlled.
 
 ### RedisDistributedMapCacheClientService
 
