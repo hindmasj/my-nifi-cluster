@@ -1,4 +1,4 @@
-### [Home](../README.md) | [Up](experiments.md) | [Prev (Enrich From Redis)](experiment-enrich_from_redis.md)
+### [Home](../README.md) | [Up](experiments.md) | [Prev (Enrich From Redis)](experiment-enrich_from_redis.md) | [Next (Some Specific Transform Cases)](experiment-some_specific_transform_cases.md)
 ---
 
 # Flow Experiment - Write To Redis
@@ -223,4 +223,4 @@ So the things to note are:-
 * When only one end is external then that threat data is preserved.
 
 ---
-### [Home](../README.md) | [Up](experiments.md) | [Prev (Enrich From Redis)](experiment-enrich_from_redis.md)
+### [Home](../README.md) | [Up](experiments.md) | [Prev (Enrich From Redis)](experiment-enrich_from_redis.md) | [Next (Some Specific Transform Cases)](experiment-some_specific_transform_cases.md)
