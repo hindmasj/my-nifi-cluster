@@ -147,6 +147,83 @@ Create a duration field from a pair of timestamps. Assume the timestamps are in 
 }]
 ```
 
+# Enrich Transport Protocol From File
+
+Here we want to use a simple file to do the transport protocol enrichment. Create the file and copy it to each of the NiFi nodes with this.
+
+```
+bin/parse-protocols.sh > transport_protocols.csv
+docker compose cp --all transport_protocols.csv nifi:/opt/nifi/nifi-current/conf
+```
+
+## Input
+
+```
+[
+{"ip_version":4,"network_transport":999},
+{"ip_version":4,"network_transport":6},
+{"ip_version":4,"network_transport":17},
+{"ip_version":4,"network_transport":114}
+]
+```
+
+## Expected Output
+
+```
+[
+{"ip_version":4,"network_transport":999},
+{"ip_version":4,"network_transport":"tcp"},
+{"ip_version":4,"network_transport":"udp"},
+{"ip_version":4,"network_transport":"0-hop"}
+]
+```
+
+## Transform
+
+### SimpleCsvFileLookupService
+
+Rename as "TransportProtocolFileLookupService".
+
+* CSV File = conf/transport_protocols.csv
+* Lookup Key Column = code
+* Lookup Value Column = name
+
+### LookupRecord
+
+* RecordReader =  = InferJsonTreeReader
+* RecordWriter = InheritJsonRecordSetWriter
+* Lookup Service = TransportProtocolFileLookupService
+* Result RecordPath = /network_transport_tmp
+* Routing Strategy = Route To Matched/Unmatched
+* Record Result Contents = Insert Entire Record
+* Record Update Strategy = Use Property
+* key = /network_transport
+
+Because of schema difficulties, you cannot write a string value back to a field that originally contained an integer. So we need a Jolt transform to copy the value across.
+
+The routing to matched/unmatched is required to avoid cases where the lookup fails on the first record. Both relationships can connect to the Jolt transform.
+
+### Jolt Transform
+
+Note the use of a string function to copy the name value. This ignores any instances where the value is a literal "null", which will be the case where there is no match.
+
+```
+[{
+	"operation": "modify-overwrite-beta",
+	"spec": {
+		"*": {
+			"network_transport": "=trim(@(1,network_transport_tmp))"
+		}
+	}
+},{
+	"operation": "remove",
+	"spec": {
+		"*": {
+			"network_transport_tmp": ""
+		}
+	}
+}]
+```
 
 ---
 ## [Home](../README.md) | [Up](experiments.md) | [Prev (Write To Redis)](experiment-write_to_redis.md)
