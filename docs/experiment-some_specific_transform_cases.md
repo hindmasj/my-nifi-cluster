@@ -225,5 +225,85 @@ Note the use of a string function to copy the name value. This ignores any insta
 }]
 ```
 
+# String Transformation
+
+## Input
+
+```
+[
+{
+  "from":"Fred Bloggs <fred@notanaddress.com>",
+  "to":"Bob Bobbins <bob@notanaddress.com>","tag":"-"
+},{
+  "from":"Mary MQ Contrary <mary@notanaddress.com>",
+  "to":"LB Peep <bo@notanaddress.com>","tag":"10.0.0.1"
+},{
+  "from":"Charlie Smith <charlie@notanaddress.com>",
+  "to":"Bill Green <bill@notanaddress.com>","tag":"10.0.0.1,192.168.0.1"
+}
+]
+```
+
+## Required Output
+
+```
+[
+{
+  "from":"Fred Bloggs fred@notanaddress.com",
+  "to":"Bob Bobbins bob@notanaddress.com","tag":"-"
+},{
+  "from":"Mary MQ Contrary mary@notanaddress.com",
+  "to":"LB Peep <bo@notanaddress.com>","tag":"Path: 10.0.0.1"
+},{
+  "from":"Charlie Smith charlie@notanaddress.com",
+  "to":"Bill Green bill@notanaddress.com","tag":"Path: 10.0.0.1,192.168.0.1"
+}
+]
+```
+
+## Transform
+
+Use an UpdateRecord.
+
+* RecordReader = InferJsonTreeReader
+* RecordWriter = InheritJsonRecordSetWriter
+* Replacement Value Strategy = Record Path Value
+
+The rules to use are
+
+| Parameter | Value
+|:--|:--
+| /from | ``replace(replace(/from,'<',''),'>','')``
+| /tag | ``replaceRegex(/tag,'([^-].*)','Path: $1')``
+| /to | ``replace(replace(/to,'<',''),'>','')``
+
+# Generate A Unique UUID
+
+## Input
+
+```
+[
+{"name":"fred"},
+{"name":"fred"},
+{"name":"fred"}
+]
+```
+## Expected Output
+```
+[
+{"name":"fred","uuid":"<uuid0>"},
+{"name":"fred","uuid":"<uuid1>"},
+{"name":"fred","uuid":"<uuid2>"}
+]
+```
+## Transform
+Use an UpdateRecord. Note the careful use of quotes and having to use a string function that can take literal values as well as path values.
+
+* RecordReader = InferJsonTreeReader
+* RecordWriter = InheritJsonRecordSetWriter
+* Replacement Value Strategy = Record Path Value
+* /uuid = ``concat('','${UUID()}')``
+
+
 ---
 ## [Home](../README.md) | [Up](experiments.md) | [Prev (Write To Redis)](experiment-write_to_redis.md)
