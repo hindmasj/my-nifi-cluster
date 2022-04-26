@@ -279,6 +279,8 @@ The rules to use are
 
 # Generate A Unique UUID
 
+Note that you need to use the Expression Language function ``${UUID()}``. If by mistake you use ``${uuid}`` then you end up with the UUID of the enclosing flow file. If you try to use ``${UUID}`` or ``${uuid()}`` then you get an error.
+
 ## Input
 
 ```
@@ -296,13 +298,46 @@ The rules to use are
 {"name":"fred","uuid":"<uuid2>"}
 ]
 ```
-## Transform
+## Transform - UpdateRecord
 Use an UpdateRecord. Note the careful use of quotes and having to use a string function that can take literal values as well as path values.
 
 * RecordReader = InferJsonTreeReader
 * RecordWriter = InheritJsonRecordSetWriter
 * Replacement Value Strategy = Record Path Value
 * /uuid = ``concat('','${UUID()}')``
+
+## Transform - Jolt - Do Not Do This
+You can also use the EL expression inside a Jolt transform. Let's see what happens.
+
+```
+[{
+	"operation": "modify-overwrite-beta",
+	"spec": {
+		"*": {
+			"uuid": "${UUID()}"
+		}
+	}
+}]
+```
+
+Results
+
+```
+[ {
+  "name" : "fred",
+  "uuid" : "3a0fd5e4-f7c9-49a4-a33c-ea13031605a2"
+}, {
+  "name" : "fred",
+  "uuid" : "3a0fd5e4-f7c9-49a4-a33c-ea13031605a2"
+}, {
+  "name" : "fred",
+  "uuid" : "3a0fd5e4-f7c9-49a4-a33c-ea13031605a2"
+} ]
+```
+
+D'oh! The EL expression is run once, before the Jolt transform is created, so when the Jolt processor gets the specification, the EL code has already run and all it gets is a fixed string.
+
+It is useful to know how this works and some EL could be used in a transform in place of, for example, an attribute to JSON transform.
 
 
 ---
