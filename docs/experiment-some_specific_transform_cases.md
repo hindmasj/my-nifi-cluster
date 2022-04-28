@@ -345,7 +345,7 @@ Note the use of a string function to copy the name value. This ignores any insta
 
 # <a name="two-stage-lookup"></a>Two Stage Lookup
 
-This complex transform has to consider two fields as keys. Only the first 2 digits of the first tag are used as the key. The second key does apply in all circumstances. The mapping looks like this.
+This complex transform has to consider two fields as keys. Only the first 2 digits of the first tag are used as the key. The second key does not apply in all circumstances. The mapping looks like this.
 
 | Key A | Key B | Output
 |:-- |:-- |:--
