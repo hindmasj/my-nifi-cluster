@@ -224,5 +224,48 @@ So the things to note are:-
 * When both ends are external, the threat information is added and the destination based information always wins as it is the second to be looked up.
 * When only one end is external then that threat data is preserved.
 
+# Alternative - Use Replace To Fix Up JSON
+
+After the lookups, it is possible to transform the content as plain text to turn the results into correct JSON. This requires a ReplaceText processor to remove the escape characters, then a Jolt to move the results into the right place. While this is simpler and quicker, there is a risk in real operation that the text replacement may have unintended consequences.
+
+## ReplaceText
+
+* Replacement Strategy = Regex Replace
+* Evaluation Mode = Entire Text
+* Search Value = ``\"(\{)|(\})\"|\\``
+* Replacement Text = ``$1$2``
+
+## JoltTransformJSON
+
+```
+[{
+	"operation": "shift",
+	"spec": {
+		"*": {
+			"Enrichment": {
+				"src_asset": {
+					"hostname": "[&(3)].device_src_hostname",
+					"mac": "[&(3)].device_src_mac_addr",
+					"location": "[&(3)].device_src_location_location"
+				},
+				"dst_asset": {
+					"hostname": "[&(3)].device_dst_hostname",
+					"mac": "[&(3)].device_dst_mac_addr",
+					"location": "[&(3)].device_dst_location_location"
+				},
+				"threat": {
+					"threat": "[&(3)].threat_type",
+					"risk": "[&(3)].threat_risk_level",
+					"Source": "[&(3)].threat_source"
+				}
+			},
+			"*": "[&(1)].&"
+		}
+	}
+}]
+```
+
+The output of the JSON can be sent straight to publish.
+
 ---
 ### [Home](../README.md) | [Up](experiments.md) | [Prev (Enrich From Redis)](experiment-enrich_from_redis.md) | [Next (Some Specific Transform Cases)](experiment-some_specific_transform_cases.md)
