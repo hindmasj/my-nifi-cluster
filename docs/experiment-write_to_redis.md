@@ -87,6 +87,8 @@ A simple flow to observe how the enrichment data might work. Start with the JSON
 1. Open configuration and change the name to "Redis Enrichment Test Bed".
 1. Start version control again under a new name.
 
+When you are ready to run the test, use the data in "samples/sample-redis-traffic.json", copy to the default producer and observe the results in the default consumer.
+
 ### Delete These
 
 You can delete the AvroSchemaRegistry and CSVReader services.
@@ -141,22 +143,22 @@ Note during processing that the single input flow file gets fragmented as the in
 
 ### MergeRecord
 
-An attempt to defragment the flowfiles post lookup. In fact this will not work as the JSON readers and writers will not be able to agree on what is a similar record.
+An attempt to defragment the flowfiles post lookup.
 
 Auto terminate the "original" relationship.
 
 * RecordReader = InferJsonTreeReader
 * RecordWriter = InheritJsonRecordSetWriter
-* Merge Strategy = Defragment
+* Merge Strategy = Bin-Packing Algorithm
 * Correlation Attribute = kafka.topic
 
-So, do not use, but added here for explanation.
+By using this the number of flow files is reduced from 6 to 2. See [Defragment Records](experiment-some_specific_transform_cases.md#defragment-records) for more explanation.
 
 ### UpdateRecord
 
 There is one UpdateRecord processor required to process the captured data into the correct fields.
 
-It consists of number of rules each with a result path and source function. The source functions all take the form:
+It consists of a number of rules, each with a result path and source function. The source functions all take the form:
 
 ```
 replaceRegex(
