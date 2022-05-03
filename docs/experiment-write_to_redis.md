@@ -265,7 +265,7 @@ After the lookups, it is possible to transform the content as plain text to turn
 }]
 ```
 
-The output of the JSON can be sent straight to publish.
+The output of the JOLT can be sent straight to publish.
 
 ---
 ### [Home](../README.md) | [Up](experiments.md) | [Prev (Enrich From Redis)](experiment-enrich_from_redis.md) | [Next (Some Specific Transform Cases)](experiment-some_specific_transform_cases.md)
