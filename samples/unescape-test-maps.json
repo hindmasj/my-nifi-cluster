@@ -1,0 +1,20 @@
+[
+  {"Enrichment":
+    {
+      "person_str": "{\"name\":\"John\",\"age\":30}}",
+      "role_str": "{\"name\":\"admin\",\"privs\":\"rw\"}}"
+    }
+  },
+  {"Enrichment":
+    {
+      "person_str": "{\"name\":\"Fred\",\"age\":18}}",
+      "role_str": "{\"name\":\"user\",\"privs\":\"rw\"}}"
+    }
+  },
+  {"Enrichment":
+    {
+      "person_str": "{\"name\":\"Bill\",\"age\":99}}",
+      "role_str": "{\"name\":\"user\",\"privs\":\"r\"}}"
+    }
+  }
+]
