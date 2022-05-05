@@ -1,4 +1,4 @@
-## [Home](../README.md) | [Up](experiments.md) | [Prev (Write To Redis)](experiment-write_to_redis.md)
+## [Home](../README.md) | [Up](experiments.md) | [Prev (Write To Redis)](experiment-write_to_redis.md) | [Next (Unpacking Lookups)](experiment-unpacking_lookups.md)
 ---
 # Flow Experiment - Some Specific Transform Cases
 
@@ -560,4 +560,4 @@ So result in both cases is that the escaping character '\' is taken literally, s
 Watch this space to see if there is an answer.
 
 ---
-## [Home](../README.md) | [Up](experiments.md) | [Prev (Write To Redis)](experiment-write_to_redis.md)
+## [Home](../README.md) | [Up](experiments.md) | [Prev (Write To Redis)](experiment-write_to_redis.md) | [Next (Unpacking Lookups)](experiment-unpacking_lookups.md)

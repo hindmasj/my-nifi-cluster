@@ -8,7 +8,6 @@
         "type": "record",
         "name": "Enrichment_type",
         "fields":[
-          {"name":"results", "type": {"type": "array", "items": "string"}},
           {"name":"person_str", "type":"string"},
           {"name":"role_str", "type":"string"},
           {
