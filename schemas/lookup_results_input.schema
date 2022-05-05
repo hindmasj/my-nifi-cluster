@@ -1,16 +1,24 @@
 {
   "type": "record",
-  "name": "enrichment",
+  "name": "lookup_results_input",
   "fields": [
+    {
+      "name": "Lookups",
+      "type": {
+        "type": "record",
+        "name": "Lookups_type",
+        "fields": [
+          {"name":"person_str", "type":"string"},
+          {"name":"role_str", "type":"string"}
+        ]
+      }
+    },
     {
       "name": "Enrichment",
       "type": {
         "type": "record",
         "name": "Enrichment_type",
         "fields":[
-          {"name":"results", "type": {"type": "array", "items": "string"}},
-          {"name":"person_str", "type":"string"},
-          {"name":"role_str", "type":"string"},
           {
             "type": "record",
             "name": "person",
