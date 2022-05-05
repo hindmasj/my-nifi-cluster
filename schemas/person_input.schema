@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "name": "events",
+  "fields": [{
+    "name": "person",
+    "type": [
+      { "name": "name", "type": "string" },
+      { "name": "age", "type": "int" }
+    ]
+  },{
+    "name":"json_str", "type":"string"
+  }]
+}

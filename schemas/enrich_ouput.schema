@@ -1,0 +1,39 @@
+{
+  "type": "record",
+  "name": "enrichment",
+  "fields": [
+    {
+      "name": "Enrichment",
+      "type": {
+        "type": "record",
+        "name": "Enrichment_type",
+        "fields":[
+          {
+            "type": "record",
+            "name": "person",
+            "type": {
+              "type": "record",
+              "name": "person_type",
+              "fields":[
+                { "name": "name", "type": "string" },
+                { "name": "age", "type": "int" }
+              ]
+            }
+          },
+          {
+            "type": "record",
+            "name": "role",
+            "type": {
+              "type": "record",
+              "name": "role_type",
+              "fields":[
+                { "name": "name", "type": "string" },
+                { "name": "age", "type": "int" }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
