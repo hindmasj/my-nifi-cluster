@@ -8,6 +8,8 @@
         "type": "record",
         "name": "Enrichment_type",
         "fields":[
+          {"name":"person_str", "type":"string"},
+          {"name":"role_str", "type":"string"},
           {
             "type": "record",
             "name": "person",
@@ -20,7 +22,6 @@
               ]
             }
           },
-          {"name":"person_str", "type":"string"},
           {
             "type": "record",
             "name": "role",
@@ -32,8 +33,7 @@
                 { "name": "age", "type": "int" }
               ]
             }
-          },
-          {"name":"role_str", "type":"string"}
+          }
         ]
       }
     }
