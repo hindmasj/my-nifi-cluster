@@ -12,7 +12,7 @@ See each article. Often each one relies on its predecessor.
 * [Write To Redis](experiment-write_to_redis.md)
 * [Some Specific Transform Cases](experiment-some_specific_transform_cases.md)
 * [Unpacking Lookups](experiment-unpacking_lookups.md)
-* [Fork / Merge Enrichment](experiment-fork_merge_enrichment.md)
+* [Fork / Join Enrichment](experiment-fork_join_enrichment.md)
 
 ---
 ### [Home (README.md)](../README.md)

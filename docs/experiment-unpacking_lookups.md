@@ -1,4 +1,4 @@
-### [Home](../README.md) | [Up](experiments.md) | [Prev (Some Specific Transform Cases)](experiment-some_specific_transform_cases.md) | [Next (Fork / Merge Enrichment)](experiment-fork_merge_enrichment.md)
+### [Home](../README.md) | [Up](experiments.md) | [Prev (Some Specific Transform Cases)](experiment-some_specific_transform_cases.md) | [Next (Fork / Merge Enrichment)](experiment-fork_join_enrichment.md)
 ---
 
 # Flow Experiment - Unpacking Lookups
@@ -156,7 +156,7 @@ Which is great for the person record, but that transform rewrites the entire "En
 
 There is a schema in "schemas/lookup_results_input.schema" and an example input in "samples/unescape-test-lookups.json" which can be used to look for a solution. The input data is now in a separate record to the enrichment results, but how can both result records be saved?
 
-One solution is to use the fork/merge enrichment process. See [the next experiment](experiment-fork_merge_enrichment.md).
+One solution is to use the fork/join enrichment process. See [the next experiment](experiment-fork_join_enrichment.md).
 
 ---
-### [Home](../README.md) | [Up](experiments.md) | [Prev (Some Specific Transform Cases)](experiment-some_specific_transform_cases.md) | [Next (Fork / Merge Enrichment)](experiment-fork_merge_enrichment.md)
+### [Home](../README.md) | [Up](experiments.md) | [Prev (Some Specific Transform Cases)](experiment-some_specific_transform_cases.md) | [Next (Fork / Merge Enrichment)](experiment-fork_join_enrichment.md)

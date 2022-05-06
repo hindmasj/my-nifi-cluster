@@ -1,6 +1,6 @@
 ### [Home](../README.md) | [Up](experiments.md) | [Prev (Unpacking Lookups)](experiment-unpacking_lookups.md)
 ---
-# Fork / Merge Enrichment
+# Fork / Join Enrichment
 This flow follows on from the previous session, now trying to incorporate the use of record style results, unescaped and copied into the enriched record. The flow is complex show is broken down here into separate phases.
 
 The completed flow, which serves both this experiment and the previous, has been saved as a template in "flow_templates/Unescape_JSON.xml".
@@ -17,7 +17,7 @@ This uses GenerateFlowFile to generate flow-files with the content taken from "s
 This transforms the person string into a person record. The enrichment branch is used to perform this to demonstrate the principle, but could be done without, as this update always succeeds.
 
 ## ForkEnrichment
-This processor needs no configuration. The "original" relationship attaches to the MergeEnrichment. The "enrichment" relationship attaches to an UpdateRecord processor.
+This processor needs no configuration. The "original" relationship attaches to the JoinEnrichment. The "enrichment" relationship attaches to an UpdateRecord processor.
 
 ## UpdateRecord
 This processor takes the person string and converts to the person record. The important point to note here is that performing the update would destroy anything already on the "Enrichment" path of the original record, so the fork has preserved that for later merging.
@@ -29,8 +29,8 @@ This processor takes the person string and converts to the person record. The im
 
 In practice this branch could also be used to capture the lookup in the first place.
 
-## MergeEnrichment
-This processor has queued the original and waits for the enrichment to complete before joining both flow files. Each record is merged by putting each into an enclosing record, for example
+## JoinEnrichment
+This processor has queued the original and waits for the enrichment to complete before joining both flow files. Each record is joined by putting each into an enclosing record, for example
 
 ```
 {
@@ -75,7 +75,7 @@ This transform uses a shift to copy the required pieces from each half of the re
 This leg now transforms the role string into a role record, and then adds this record to the person record. The point to note here is while the role record is created on the enrichment branch, the person record is preserved on the original branch.
 
 ## ForkEnrichment
-As above, this processor needs no configuration. The "original" relationship attaches to the MergeEnrichment. The "enrichment" relationship attaches to an UpdateRecord processor.
+As above, this processor needs no configuration. The "original" relationship attaches to the JoinEnrichment. The "enrichment" relationship attaches to an UpdateRecord processor.
 
 ## UpdateRecord
 This processor takes the role string and converts to the role record. We no longer care about losing the person record as it has been preserved on the original branch.
@@ -85,7 +85,7 @@ This processor takes the role string and converts to the role record. We no long
 * Replacement Value Strategy = Record Path Value
 * /Enrichment = unescapeJson(/Lookups/role_str)
 
-## MergeEnrichment
+## JoinEnrichment
 This processor is the same as above. The failure and timeout relationships go to error handling. The original relationship is terminated and the joined relationship goes to the JoltTransformJSON.
 
 * Original Record Reader = SchemaJsonTreeReader
