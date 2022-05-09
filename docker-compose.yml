@@ -65,6 +65,7 @@ services:
       endpoint_mode: vip
     ports:
       - 8080 # Unsecured HTTP Web Port
+      - 8083 # Unsecured listening port
     environment:
       - NIFI_WEB_HTTP_PORT=8080
       - NIFI_CLUSTER_IS_NODE=true
