@@ -14,6 +14,7 @@
 * [Defragment Records](#defragment-records)
 * [Generate A Unique UUID](#generate-uuid)
 * [Change Comma Separated String To Newlines](#csv-to-nl)
+* [Change Hex To Decimal](#hex-to-dec)
 
 # <a name="set-up"></a>Set Up
 
@@ -345,7 +346,7 @@ Note the use of a string function to copy the name value. This ignores any insta
 
 # <a name="two-stage-lookup"></a>Two Stage Lookup
 
-This complex transform has to consider two fields as keys. Only the first 2 digits of the first tag are used as the key. The second key does apply in all circumstances. The mapping looks like this.
+This complex transform has to consider two fields as keys. Only the first 2 digits of the first tag are used as the key. The second key does not apply in all circumstances. The mapping looks like this.
 
 | Key A | Key B | Output
 |:-- |:-- |:--
@@ -558,6 +559,42 @@ c"}
 So result in both cases is that the escaping character '\' is taken literally, so the 'n' cannot be interpreted as a newline. Also tried using multiple escapes and literal new lines (shift+enter) but neither worked, the latter causing an error.
 
 Watch this space to see if there is an answer.
+
+# <a name="hex-to-dec"></a>Change Hexdecimal String To A Decimal
+
+Say you have a record like This
+
+```
+[{"my_field":"a"},{"my_field":"bb"}]
+```
+
+and you want it to look like this
+
+```
+[{"my_field":10},{"my_field":187}]
+```
+
+You can use the literal value strategy of an UpdateRecord, and feature that allows you use path values in an EL expression, to change the value of the field using EL functions. The secret is that you can reference the current value of the field with the expression ``${field.value}``. To change the number valued string to an actual number you would need a Jolt transform.
+
+## UpdateRecord
+
+* RecordReader = InferJsonTreeReader
+* RecordWriter = InheritJsonRecordSetWriter
+* Replacement Value Strategy = Literal Value
+* /my_field = ``${field.value:fromRadix(16)}``
+
+## JoltTransformJSON
+
+```
+[{
+    "operation": "modify-overwrite-beta",
+    "spec": {
+        "*": {
+            "my_field": "=toInteger(@(0))"
+        }
+    }
+}]
+```
 
 ---
 ## [Home](../README.md) | [Up](experiments.md) | [Prev (Write To Redis)](experiment-write_to_redis.md) | [Next (Unpacking Lookups)](experiment-unpacking_lookups.md)
