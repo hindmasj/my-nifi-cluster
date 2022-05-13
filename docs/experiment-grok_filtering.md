@@ -108,5 +108,78 @@ Examining the output shows that the records of interest shows a full JSON record
 } ]
 ```
 
+# Adding A Don't Care Field
+
+Consider the fact you might get valid records, but with some fields not populated, or populated for a blank value. If we also want to accept these records
+
+```
+192.168.0.1,80,192.168.0.2,12348,,
+192.168.0.1,80,192.168.0.2,12348,99,
+```
+## Grok Expression
+
+Then change the Grok expression to
+```
+^%{IP:src_addr},%{POSINT:src_port},%{IP:dst_addr},%{POSINT:dst_port},%{POSINT:score}?,%{DATA:message}?$
+```
+
+where the "?" will allow the capture of empty fields, provided the space where they should be (in this case commas) is still present.
+
+## Partition Expression
+
+So now the message might be empty, but we are still interested in it. We only want to reject the record if the message is null, meaning the Grok failed.
+
+* Is_Valid = ``matchesRegex(/message,'.*')``
+
+So we now get some extra records in the "Valid" queue.
+
+```
+{
+  "src_addr" : "192.168.0.1",
+  "src_port" : "80",
+  "dst_addr" : "192.168.0.2",
+  "dst_port" : "12348",
+  "score" : null,
+  "message" : "",
+  "stackTrace" : null,
+  "_raw" : "192.168.0.1,80,192.168.0.2,12348,,"
+}, {
+  "src_addr" : "192.168.0.1",
+  "src_port" : "80",
+  "dst_addr" : "192.168.0.2",
+  "dst_port" : "12348",
+  "score" : "99",
+  "message" : "",
+  "stackTrace" : null,
+  "_raw" : "192.168.0.1,80,192.168.0.2,12348,99,"
+}
+```
+
+So we learn here that selecting which are and are not valid records, or choosing how to partition records depends on you knowing your data and your requirements.
+
+# Multi-Way Partition
+
+Say we want more choices on how we want to partition and route the data. Maybe that score value is important.
+
+## Partition Expressions
+
+This time we want to partition by the score value. If the score is > 50 go one way, if <= 50 go another, and where the score is not set goes a 3rd way. We still want to filter out the invalid records.
+
+* HighScore = ``not(isEmpty(/score[. > 50]))``
+* LowScore = ``not(isEmpty(/score[. <= 50]))``
+* NoScore = ``isEmpty(/score)``
+* IsValid = ``matchesRegex(/message,'.*')``
+
+## Route Expression
+
+Here we have to distinguish between a valid and an invalid record when the score is not set.
+
+* High = ``${HighScore:equals(true)}``
+* Low = ``${LowScore:equals(true)}``
+* NoScore = ``${NoScore:equals(true):and(${IsValid:equals(true)})}``
+* Invalid = ``${IsValid:equals(false)}``
+
+There are 4 relationships, as named above.
+
 ---
 ### [Home](../README.md) | [Up](experiments.md) | [Prev (Fork / Join Enrichment)](experiment-fork_join_enrichment.md)
