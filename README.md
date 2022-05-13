@@ -4,9 +4,18 @@ Quick project to create a NiFi cluster in Docker.
 
 Inspired by article [Running a cluster with Apache Nifi and Docker](https://www.nifi.rocks/apache-nifi-docker-compose-cluster/) and shamelessly pinched their compose file, hence the Apache licence. Uses the [Apache NiFi Image](https://hub.docker.com/r/apache/nifi).
 
-[Jump To Sub-document List](#subdocs)
+* [Installation](#installation)
+* [Operation](#operation)
+ * [Quickstart](#quickstart)
+ * [Start](#start)
+ * [Create Flows](#template)
+ * [Manage Kafka](#kafka)
+ * [Process Some Data](#process)
+ * [Stop](#stop)
+* [Registry](#registry)
+* [Further Documents](#subdocs)
 
-# Installation
+# <a name="installation"></a>Installation
 
 Before starting you will need to create a new git repo to store the flows in. It is not a good idea to use this repo.
 
@@ -15,9 +24,9 @@ git init ../flow_storage
 sudo chown -R 1000.1000 ../flow_storage
 ```
 
-# Operation
+# <a name="operation"></a>Operation
 
-## Quickstart
+## <a name="quickstart"></a>Quickstart
 
 1. Start the cluster ``docker compose up -d``.
 1. Create some topics ``bin/launch-script.sh``.
@@ -29,7 +38,7 @@ You might need to wait a minute from starting the cluster to using the URL, as i
 
 See how to load flows from a [template](#template) or from the [NiFi registry](#registry). Then look at producing and consuming data with [Kafka](#process).
 
-## Start
+## <a name="start"></a>Start
 
 To start the cluster up and connect to the NiFi desktop.
 
@@ -57,7 +66,7 @@ Then add the template onto the desktop from the design bar.
 
 &nbsp; &nbsp; *drag template icon* -> Choose Template: "Simple_Kafka_Flow" -> Add
 
-## Manage Kafka
+## <a name="kafka"></a>Manage Kafka
 
 ### One Off Commands
 
@@ -179,7 +188,7 @@ one is the number
 ```
 As this is so useful you can launch it with ``bin/launch-script.sh consumer``.
 
-## Stop
+## <a name="stop"></a>Stop
 
 Simply ``docker compose down`` to stop the cluster and destroy the containers. If you want to preserve the containers then use ``docker compose stop``.
 
@@ -221,7 +230,12 @@ To simplify the documentation, further sections have been moved to separate docu
 * [Custom Processors](docs/custom_processors.md)
 * [Issues](docs/issues.md)
 * [Experiments](docs/experiments.md)
-  * [- Standard Processors](docs/experiment-standard_processors.md)
-  * [- Using Tab Separation](docs/experiment-tab_separation.md)
-  * [- Convert To ECS](docs/experiment-convert_to_ecs.md)
-  * [- Enrich From Redis](docs/experiment-enrich_from_redis.md)
+  * [Standard Processors](docs/experiment-standard_processors.md)
+  * [Using Tab Separation](docs/experiment-tab_separation.md)
+  * [Convert To ECS](docs/experiment-convert_to_ecs.md)
+  * [Enrich From Redis](docs/experiment-enrich_from_redis.md)
+  * [Write To Redis](experiment-write_to_redis.md)
+  * [Some Specific Transform Cases](experiment-some_specific_transform_cases.md)
+  * [Unpacking Lookups](experiment-unpacking_lookups.md)
+  * [Fork / Join Enrichment](experiment-fork_join_enrichment.md)
+  * [Grok Filtering](experiment-grok_filtering.md)

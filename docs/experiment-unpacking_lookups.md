@@ -1,4 +1,4 @@
-### [Home](../README.md) | [Up](experiments.md) | [Prev (Some Specific Transform Cases)](experiment-some_specific_transform_cases.md) | [Next (Fork / Merge Enrichment)](experiment-fork_join_enrichment.md)
+### [Home](../README.md) | [Up](experiments.md) | [Prev (Some Specific Transform Cases)](experiment-some_specific_transform_cases.md) | [Next (Fork / Join Enrichment)](experiment-fork_join_enrichment.md)
 ---
 
 # Flow Experiment - Unpacking Lookups
@@ -159,4 +159,4 @@ There is a schema in "schemas/lookup_results_input.schema" and an example input 
 One solution is to use the fork/join enrichment process. See [the next experiment](experiment-fork_join_enrichment.md).
 
 ---
-### [Home](../README.md) | [Up](experiments.md) | [Prev (Some Specific Transform Cases)](experiment-some_specific_transform_cases.md) | [Next (Fork / Merge Enrichment)](experiment-fork_join_enrichment.md)
+### [Home](../README.md) | [Up](experiments.md) | [Prev (Some Specific Transform Cases)](experiment-some_specific_transform_cases.md) | [Next (Fork / Join Enrichment)](experiment-fork_join_enrichment.md)

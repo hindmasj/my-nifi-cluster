@@ -13,6 +13,7 @@ See each article. Often each one relies on its predecessor.
 * [Some Specific Transform Cases](experiment-some_specific_transform_cases.md)
 * [Unpacking Lookups](experiment-unpacking_lookups.md)
 * [Fork / Join Enrichment](experiment-fork_join_enrichment.md)
+* [Grok Filtering](experiment-grok_filtering.md)
 
 ---
 ### [Home (README.md)](../README.md)

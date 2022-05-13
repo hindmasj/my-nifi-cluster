@@ -1,4 +1,4 @@
-### [Home](../README.md) | [Up](experiments.md) | [Prev (Unpacking Lookups)](experiment-unpacking_lookups.md)
+### [Home](../README.md) | [Up](experiments.md) | [Prev (Unpacking Lookups)](experiment-unpacking_lookups.md) | [Next (Grok Filtering)](experiment-grok_filtering.md)
 ---
 # Fork / Join Enrichment
 This flow follows on from the previous session, now trying to incorporate the use of record style results, unescaped and copied into the enriched record. The flow is complex show is broken down here into separate phases.
@@ -134,4 +134,4 @@ The final record looks like this.
 ```
 
 ---
-### [Home](../README.md) | [Up](experiments.md) | [Prev (Unpacking Lookups)](experiment-unpacking_lookups.md)
+### [Home](../README.md) | [Up](experiments.md) | [Prev (Unpacking Lookups)](experiment-unpacking_lookups.md) | [Next (Grok Filtering)](experiment-grok_filtering.md)
