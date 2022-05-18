@@ -44,8 +44,8 @@ The semantic is simply a name for the group which can then be used in filtering 
 
 The generated files pass into a PartitionRecord processor. This uses the Grok reader to process each record within the flow file. Create a property to test if the "message" field has been parsed by the GrokReader. This will be set as an attribute on every flow file, and will be either true or false, depending on the state of the content.
 
-* RecordReader = GrokReader
-* Record Writer = InferJsonRecordSetWriter
+* Record Reader = GrokReader
+* Record Writer = InheritJsonRecordSetWriter
 * Is_Valid = ``not(isEmpty(/message))``
 
 Terminate the original relationship and route success to the next processor.
@@ -108,9 +108,9 @@ Examining the output shows that the records of interest shows a full JSON record
 } ]
 ```
 
-# Adding A Don't Care Field
+# Adding a Maybe Field
 
-Consider the fact you might get valid records, but with some fields not populated, or populated for a blank value. If we also want to accept these records
+Consider the fact you might get valid records, but with some fields not populated, or populated with a blank value. If we also want to accept these records
 
 ```
 192.168.0.1,80,192.168.0.2,12348,,
@@ -181,5 +181,17 @@ Here we have to distinguish between a valid and an invalid record when the score
 
 There are 4 relationships, as named above.
 
----
+# Fixing the SYSLOG Timestamp
+
+The Grok pattern "SYSLOGTIMESTAMP" will capture a timestamp in the format "MMM dd HH:MM:SS", for example ``May 16 09:10:11``, which as you will note does not include the year. If you try to convert this into epoch-millis the conversion assumes the year is 0 (1970) and you will get the wrong result. There are number of ways in which you can correct this. This one uses an UpdateRecord rule written in RecordPath, making use of some Expression Language too. Here are two formulae which convert the original timestamp ("raw_ts") into either an epoch-millis or an ISO8601 timestamp.
+
+* "epoch-millis" = ``toDate( concat( ${now(): format("yyyy")}, /raw_ts),
+ 'yyyyMMM dd HH:mm:ss','UTC')``
+* "iso8601_ts" = ``format( toDate(  concat( ${now(): format("yyyy")}, /raw_ts),
+  'yyyyMMM dd HH:mm:ss', 'UTC'),
+ "yyyy-MM-dd'T'HH:mm:ss", "UTC")``
+
+Note how the ``now()`` function is used to create the current year, then is prepended to the timestamp before conversion.
+
+--
 ### [Home](../README.md) | [Up](experiments.md) | [Prev (Fork / Join Enrichment)](experiment-fork_join_enrichment.md)
