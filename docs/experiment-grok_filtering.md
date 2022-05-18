@@ -193,5 +193,60 @@ The Grok pattern "SYSLOGTIMESTAMP" will capture a timestamp in the format "MMM d
 
 Note how the ``now()`` function is used to create the current year, then is prepended to the timestamp before conversion.
 
---
+# More Advanced Grok Parsing and Routing
+
+## Input Text
+
+Three different types of message, and two sub types. Parse them and send each one to a different way of processing.
+
+```
+<site1> Jan 01 09:10:11 192.168.0.1 host1.myco.co.uk ABCD - MESSAGE_TYPE_A [fred@home.my.co.uk.68513 key1="value 1" key2="value 2"]
+<site1> Feb 01 10:10:11 192.168.0.2 host1.myco.co.uk ABCD - MESSAGE_TYPE_B this is just more comments
+this is not a valid message
+<site2> Mar 02 09:10:11 192.168.0.1 host1.myco.co.uk ABCD - MESSAGE_TYPE_FRED [fred@home.my.co.uk.68513 key1="value 1" key2="value 2"]
+<site3> May 03 09:10:11 192.168.0.1 host1.myco.co.uk ABCD - MESSAGE_TYPE_BILL [fred@home.my.co.uk.68513 key1="value 1" key2="value 2"]
+```
+
+## Grok Patterns
+
+```
+HEADER <%{DATA:site_id}>\s%{SYSLOGTIMESTAMP:event_ts}\s%{IP:device_gen_addr_ipv4}\s%{DATA:device_gen_hostname}\s%{DATA:event_category_id}\s-\s%{DATA:event_category_name}
+KVARRAY \[\w+@%{DATA}\s%{DATA:kv_array_tmp}\]
+```
+
+Copy this file to all nodes with
+
+```
+docker compose cp --all samples/custom-patterns.grok nifi:/opt/nifi/nifi-current/conf
+```
+
+## GrokReader Service
+
+* Grok Expression = ``^%{HEADER}\s%{KVARRAY}?%{GREEDYDATA:event_tag}$``
+* Grok Pattern File = "conf/custom-patterns.grok"
+* No Match Behaviour = Raw Line
+
+## PartitionRecord
+
+* Record Reader = GrokReader
+* Record Writer = InheritJsonRecordSetWriter
+* IsValid = ``not(isEmpty(/site_id))``
+* IsPlainMessage = ``not(isEmpty(/event_tag))``
+* IsKVMessage = ``not(isEmpty(/kv_array_tmp))``
+* IsMessageFred = ``/event_category_name[. = 'MESSAGE_TYPE_FRED']``
+* IsMessageBill = ``/event_category_name[. = 'MESSAGE_TYPE_BILL']``
+
+## Routing All Separately
+
+So we could set up all sorts of routing by attribute based on the above truths. The first one is to send each one to its own relationship.
+
+Set up a RouteOnAttribute. There will be four relationships for each type of message, and the invalid ones go to "unmatched".
+
+* Routing Strategy = Route To Property Name
+* PlainMessage = ``${IsPlainMessage:equals(true)}``
+* KVMessage = ``${IsKVMessage:equals(true): and(${IsMessageFred:isEmpty()}): and(${IsMessageBill:isEmpty()})}``
+* FredMessage = ``${IsMessageFred:isEmpty():not()}``
+* BillMessage = ``${IsMessageBill:isEmpty():not()}``
+
+---
 ### [Home](../README.md) | [Up](experiments.md) | [Prev (Fork / Join Enrichment)](experiment-fork_join_enrichment.md)

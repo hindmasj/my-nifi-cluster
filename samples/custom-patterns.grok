@@ -1,0 +1,4 @@
+
+HEADER <%{DATA:site_id}>\s%{SYSLOGTIMESTAMP:event_ts}\s%{IP:device_gen_addr_ipv4}\s%{DATA:device_gen_hostname}\s%{DATA:event_category_id}\s-\s%{DATA:event_category_name}
+
+KVARRAY \[\w+@%{DATA}\s%{DATA:kv_array_tmp}\]
