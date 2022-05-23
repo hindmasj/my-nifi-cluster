@@ -7,12 +7,19 @@ This covers using the [GrokReader](https://nifi.apache.org/docs/nifi-docs/compon
 
 Using the GrokReader service allows you to define valid patterns for arbitrary records, extract the key fields and rewrite them as JSON. Use it inside a PartitionRecord to test the extracted records, label them, and split the matching and non-matching records into separate flow files. A RouteOnAttribute processor can then ensure the different flowfiles get sent to different treatment branches.
 
+* [Simple Example](simple-example)
+* [Adding a Maybe Field](maybe-field)
+* [Multi-Way Partition](multi-way-partition)
+* [Fixing the SYSLOG Timestamp](fix-syslog-timestamp)
+* [More Advanced Grok Parsing and Routing](advanced)
+* [Parsing The KVP Array](parsing)
+
 ## References
 
 * The [Logstash Patterns project](https://github.com/logstash-plugins/logstash-patterns-core) defines what are regarded as the [Basic Patterns](https://github.com/logstash-plugins/logstash-patterns-core/blob/main/patterns/ecs-v1/grok-patterns).
 * [Tester for all grok patterns](https://grokconstructor.appspot.com/do/match)
 
-# Simple Example
+# <a name="simple-example"></a>Simple Example
 
 ## Input Data
 
@@ -108,7 +115,7 @@ Examining the output shows that the records of interest shows a full JSON record
 } ]
 ```
 
-# Adding a Maybe Field
+# <a name="maybe-field"></a>Adding a Maybe Field
 
 Consider the fact you might get valid records, but with some fields not populated, or populated with a blank value. If we also want to accept these records
 
@@ -157,7 +164,7 @@ So we now get some extra records in the "Valid" queue.
 
 So we learn here that selecting which are and are not valid records, or choosing how to partition records depends on you knowing your data and your requirements.
 
-# Multi-Way Partition
+# <a name="multi-way-partition"></a>Multi-Way Partition
 
 Say we want more choices on how we want to partition and route the data. Maybe that score value is important.
 
@@ -181,7 +188,7 @@ Here we have to distinguish between a valid and an invalid record when the score
 
 There are 4 relationships, as named above.
 
-# Fixing the SYSLOG Timestamp
+# <a name="fix-syslog-timestamp"></a>Fixing the SYSLOG Timestamp
 
 The Grok pattern "SYSLOGTIMESTAMP" will capture a timestamp in the format "MMM dd HH:MM:SS", for example ``May 16 09:10:11``, which as you will note does not include the year. If you try to convert this into epoch-millis the conversion assumes the year is 0 (1970) and you will get the wrong result. There are number of ways in which you can correct this. This one uses an UpdateRecord rule written in RecordPath, making use of some Expression Language too. Here are two formulae which convert the original timestamp ("raw_ts") into either an epoch-millis or an ISO8601 timestamp.
 
@@ -193,7 +200,7 @@ The Grok pattern "SYSLOGTIMESTAMP" will capture a timestamp in the format "MMM d
 
 Note how the ``now()`` function is used to create the current year, then is prepended to the timestamp before conversion.
 
-# More Advanced Grok Parsing and Routing
+# <a name="advanced"></a>More Advanced Grok Parsing and Routing
 
 ## Input Text
 
@@ -247,6 +254,93 @@ Set up a RouteOnAttribute. There will be four relationships for each type of mes
 * KVMessage = ``${IsKVMessage:equals(true): and(${IsMessageFred:isEmpty()}): and(${IsMessageBill:isEmpty()})}``
 * FredMessage = ``${IsMessageFred:isEmpty():not()}``
 * BillMessage = ``${IsMessageBill:isEmpty():not()}``
+
+# <a name="advanced"></a>Parsing The KVP Array
+
+This section looks at some ways of cleaning up the KVP Array.
+
+## Input
+```
+[
+{"kv_array_tmp": "key1=\"value 1\" key2=\"value 2\""},
+{"kv_array_tmp": "key3=\"value a\" key4=\"value b\""}
+]
+```
+
+## Required Output
+
+```
+[
+{"kv_array_tmp":{"key1":"value 1", "key2":"value 2"}},
+{"kv_array_tmp":{"key3":"value a", "key4":"value b"}}
+]
+```
+
+## Start With A Regex
+
+In an UpdateAttribute, apply this regex.
+
+* kv_array_tmp = ``replaceRegex( replaceRegex(/kv_array_tmp,'=\"',':'), '\" ?','|')``
+
+which gives you
+
+```
+[ {
+  "kv_array_tmp" : "key1:value 1|key2:value 2|"
+}, {
+  "kv_array_tmp" : "key3:value a|key4:value b|"
+} ]
+```
+
+## Split
+
+```
+[{
+	"operation": "modify-overwrite-beta",
+	"spec": {
+		"*": {
+			"kv_array_tmp": "=split('\\|',@(0))"
+		}
+	}
+}]
+```
+yields
+```
+[{
+	"kv_array_tmp": ["key1:value 1", "key2:value 2"]
+}, {
+	"kv_array_tmp": ["key3:value a", "key4:value b"]
+}]
+```
+
+## Arrange
+
+Add this
+```
+, {
+	"operation": "modify-overwrite-beta",
+	"spec": {
+		"*": {
+			"kv_array_tmp": ["=split(':',@(0))"]
+		}
+	}
+}
+```
+yields
+```
+[{
+	"kv_array_tmp": [
+		["key1", "value 1"],
+		["key2", "value 2"]
+	]
+}, {
+	"kv_array_tmp": [
+		["key3", "value a"],
+		["key4", "value b"]
+	]
+}]
+```
+So the question then is, which format is easier to interrogate?
 
 ---
 ### [Home](../README.md) | [Up](experiments.md) | [Prev (Fork / Join Enrichment)](experiment-fork_join_enrichment.md)
