@@ -340,7 +340,124 @@ yields
 	]
 }]
 ```
-So the question then is, which format is easier to interrogate?
+
+## Split Keys From Pairs
+
+This is step one of a two step process. See [Stack Overflow - Jolt - How to convert two arrays to key value](https://stackoverflow.com/questions/67952282/jolt-how-to-convert-two-arrays-to-key-value-and-keep-other-singles-properties). Separate the keys into one array and values into another.
+
+```
+, {
+    "operation": "shift",
+    "spec": {
+      "*": {
+        "kv_array_tmp": {
+          "*": {
+            "0": "[&3].&2.keys",
+            "1": "[&3].&2.values"
+          }
+        }
+      }
+    }
+  }
+```
+yields
+```
+[ {
+  "kv_array_tmp" : {
+    "keys" : [ "key1", "key2" ],
+    "values" : [ "value 1", "value 2" ]
+  }
+}, {
+  "kv_array_tmp" : {
+    "keys" : [ "key3", "key4" ],
+    "values" : [ "value a", "value b" ]
+  }
+} ]
+```
+
+## Pair Up Keys With Values
+
+This is step 2, to match the keys and the values.
+
+```
+, {
+    "operation": "shift",
+    "spec": {
+      "*": {
+        "kv_array_tmp": {
+          "values": {
+            "*": {
+              "@": "[&4].&3.@(3,keys[&1])"
+            }
+          }
+        }
+      }
+    }
+  }
+```
+yields
+```
+[ {
+  "kv_array_tmp" : {
+    "key1" : "value 1",
+    "key2" : "value 2"
+  }
+}, {
+  "kv_array_tmp" : {
+    "key3" : "value a",
+    "key4" : "value b"
+  }
+} ]
+```
+
+Which is what we want!
+
+## Recap
+
+The full transform is
+
+```
+[{
+  "operation": "modify-overwrite-beta",
+  "spec": {
+    "*": {
+      "kv_array_tmp": "=split('\\|',@(0))"
+    }
+  }
+}, {
+  "operation": "modify-overwrite-beta",
+  "spec": {
+    "*": {
+      "kv_array_tmp": ["=split(':',@(0))"]
+    }
+  }
+}, {
+  "operation": "shift",
+  "spec": {
+    "*": {
+      "kv_array_tmp": {
+        "*": {
+          "0": "[&3].&2.keys",
+          "1": "[&3].&2.values"
+        }
+      }
+    }
+  }
+}, {
+  "operation": "shift",
+  "spec": {
+    "*": {
+      "kv_array_tmp": {
+        "values": {
+          "*": {
+            "@": "[&4].&3.@(3,keys[&1])"
+          }
+        }
+      }
+    }
+  }
+}]
+```
 
 ---
 ### [Home](../README.md) | [Up](experiments.md) | [Prev (Fork / Join Enrichment)](experiment-fork_join_enrichment.md)
