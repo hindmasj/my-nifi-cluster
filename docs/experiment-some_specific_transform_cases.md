@@ -268,11 +268,11 @@ The Jolt transform is much neater.
 
 # <a name="file-based-lookup"></a>Enrich Transport Protocol From File
 
-Here we want to use a simple file to do the transport protocol enrichment. Create the file and copy it to each of the NiFi nodes with this.
+Here we want to use a simple file to do the transport protocol enrichment. Create the file and copy it to each of the NiFi nodes with this. (Note, older version of docker require the "--all" flag)
 
 ```
 bin/parse-protocols.sh > transport_protocols.csv
-docker compose cp --all transport_protocols.csv nifi:/opt/nifi/nifi-current/conf
+docker compose cp transport_protocols.csv nifi:/opt/nifi/nifi-current/conf
 ```
 
 ## Input
@@ -390,7 +390,7 @@ Y3100,Y/A
 Y3101,Y/B
 ```
 
-``docker compose cp --all samples/name_mapping.csv nifi:/opt/nifi/nifi-current/conf``
+``docker compose cp samples/name_mapping.csv nifi:/opt/nifi/nifi-current/conf``
 
 ## Lookup Service
 Rename as "NameMappingFileLookupService".

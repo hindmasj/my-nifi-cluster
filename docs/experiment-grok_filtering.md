@@ -224,7 +224,7 @@ KVARRAY \[\w+@%{DATA}\s%{DATA:kv_array_tmp}\]
 Copy this file to all nodes with
 
 ```
-docker compose cp --all samples/custom-patterns.grok nifi:/opt/nifi/nifi-current/conf
+docker compose cp samples/custom-patterns.grok nifi:/opt/nifi/nifi-current/conf
 ```
 
 ## GrokReader Service
