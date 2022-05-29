@@ -15,6 +15,7 @@
 * [Generate A Unique UUID](#generate-uuid)
 * [Change Comma Separated String To Newlines](#csv-to-nl)
 * [Change Hex To Decimal](#hex-to-dec)
+* [Extract Parts Of A Windows Path](windows-path)
 
 # <a name="set-up"></a>Set Up
 
@@ -595,6 +596,33 @@ You can use the literal value strategy of an UpdateRecord, and feature that allo
     }
 }]
 ```
+
+# <a name="windows-path"></a>Extract Parts Of A Windows Path
+
+## Requirement
+
+Given a path like ``[{"fred" : "C:\\Program Files\\fred.exe"}]``
+
+Extract the drive, path, filename and extension, for example:
+```
+[ {
+  "fred" : "C:\\Program Files\\fred.exe",
+	"drive" : "C:"
+  "path" : "\\Program Files\\",
+  "filename" : "fred.exe",
+  "extension" : "exe"
+} ]
+```
+
+## Transforms
+
+Using an UpdateRecord.
+
+* /drive = ``replaceRegex(/fred, '^(.*:).*$', '$1')``
+* /path = ``replaceRegex(/fred, '^.*:(.*\\)[^\\]*$', '$1')``
+* /filename = ``replaceRegex(/fred, '^.*\\([^\\]+)$', '$1')``
+* /extension = ``replaceRegex(/fred, '^.*\.([^\.]+)$', '$1')``
+
 
 ---
 ## [Home](../README.md) | [Up](experiments.md) | [Prev (Write To Redis)](experiment-write_to_redis.md) | [Next (Unpacking Lookups)](experiment-unpacking_lookups.md)
