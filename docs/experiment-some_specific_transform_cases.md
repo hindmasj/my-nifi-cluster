@@ -621,8 +621,16 @@ Using an UpdateRecord.
 * /drive = ``replaceRegex(/fred, '^(.*:).*$', '$1')``
 * /path = ``replaceRegex(/fred, '^.*:(.*\\)[^\\]*$', '$1')``
 * /filename = ``replaceRegex(/fred, '^.*\\([^\\]+)$', '$1')``
-* /extension = ``replaceRegex(/fred, '^.*\.([^\.]+)$', '$1')``
+* /extension = ``replaceRegex(/fred[contains(.,'.')],'^.*\.([^\\\.]*)$','$1')``
 
+The special case for the extension needs to detect if there is an extension before trying the match. You will still get an edge case where there is no extension but there is a dot in a directory name. Still need to think about this. The problem is, if the match fails, the whole input string is passed to the output.
+
+With this input: ``{"fred":"C:\\Program Files\\My.Dir\\not fred"}``, you get the following output for different "extension" functions.
+
+| Function | Output
+|:--|:--
+| ``replaceRegex(/fred[contains(.,'.')],'^.*\.([^\\\.]*)$','$1')`` | C:\\Program Files\\My.Dir\\not fred
+| ``substringAfterLast(replaceRegex(/fred[contains(.,'.')],'^.*\\([^\\]+)$','$1'),'.')`` | not fred
 
 ---
 ## [Home](../README.md) | [Up](experiments.md) | [Prev (Write To Redis)](experiment-write_to_redis.md) | [Next (Unpacking Lookups)](experiment-unpacking_lookups.md)
