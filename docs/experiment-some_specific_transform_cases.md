@@ -15,7 +15,7 @@
 * [Generate A Unique UUID](#generate-uuid)
 * [Change Comma Separated String To Newlines](#csv-to-nl)
 * [Change Hex To Decimal](#hex-to-dec)
-* [Extract Parts Of A Windows Path](windows-path)
+* [Extract Parts Of A Windows Path](#windows-path)
 
 # <a name="set-up"></a>Set Up
 
