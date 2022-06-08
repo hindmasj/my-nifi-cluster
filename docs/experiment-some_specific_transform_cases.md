@@ -609,6 +609,7 @@ Extract the drive, path, filename and extension, for example:
   "fred" : "C:\\Program Files\\fred.exe",
 	"drive" : "C:"
   "path" : "\\Program Files\\",
+	"fullpath": "C:\\Program Files\\",
   "filename" : "fred.exe",
   "extension" : "exe"
 } ]
@@ -620,6 +621,7 @@ Using an UpdateRecord.
 
 * /drive = ``replaceRegex(/fred, '^(.*:).*$', '$1')``
 * /path = ``replaceRegex(/fred, '^.*:(.*\\)[^\\]*$', '$1')``
+* /fullpath = ``replaceRegex(/fred, '^(.*\\)[^\\]*$', '$1')``
 * /filename = ``replaceRegex(/fred, '^.*\\([^\\]+)$', '$1')``
 * /extension = ``replaceRegex(/fred[contains(.,'.')],'^.*\.([^\\\.]*)$','$1')``
 
