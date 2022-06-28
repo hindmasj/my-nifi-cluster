@@ -78,7 +78,7 @@ Note that now the parameter context is associated with the process group, whenev
 Create space in the record to put the enriched data by adding this to the modify-overwrite spec.
 
 ```
-{
+[{
    "operation":"modify-overwrite-beta",
    "spec": {
      "*": {

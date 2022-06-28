@@ -1,0 +1,17 @@
+{
+  "type":"record",
+  "namespace":"io.github.hindmasj",
+  "name":"NetworkTransportEnrichment",
+  "fields": [
+    {"name":"network_transport", "type":
+      {"name":"NetworkTransportRecord","type":"record",
+        "fields":[
+          {"name":"name","type":"string"},
+          {"name":"code","type":"long"},
+          {"name":"alias","type":"string"},
+          {"name":"comment","type":"string"}
+        ]
+      }
+    }
+  ]
+}

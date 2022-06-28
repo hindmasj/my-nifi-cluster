@@ -1,0 +1,18 @@
+{
+  "type":"record",
+  "namespace":"io.github.hindmasj",
+  "name":"ServiceProtocolEnrichment",
+  "fields": [
+    {"name":"service_protocol", "type":
+      {"name":"ServiceProtocolRecord","type":"record",
+        "fields":[
+          {"name":"name","type":"string"},
+          {"name":"code","type":"long"},
+          {"name":"protocol","type":"string"},
+          {"name":"alias","type":"string"},
+          {"name":"comment","type":"string"}
+        ]
+      }
+    }
+  ]
+}
