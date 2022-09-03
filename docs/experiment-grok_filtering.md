@@ -1,4 +1,4 @@
-### [Home](../README.md) | [Up](experiments.md) | [Prev (Fork / Join Enrichment)](experiment-fork_join_enrichment.md)
+### [Home](../README.md) | [Up](experiments.md) | [Prev (Fork / Join Enrichment)](experiment-fork_join_enrichment.md) | [Next (Running Redis Commands Directly)](experiment-redis_direct.md)
 ---
 
 # Grok Filtering
@@ -460,4 +460,4 @@ The full transform is
 ```
 
 ---
-### [Home](../README.md) | [Up](experiments.md) | [Prev (Fork / Join Enrichment)](experiment-fork_join_enrichment.md)
+### [Home](../README.md) | [Up](experiments.md) | [Prev (Fork / Join Enrichment)](experiment-fork_join_enrichment.md) | [Next (Running Redis Commands Directly)](experiment-redis_direct.md)

@@ -6,12 +6,12 @@ Inspired by article [Running a cluster with Apache Nifi and Docker](https://www.
 
 * [Installation](#installation)
 * [Operation](#operation)
- * [Quickstart](#quickstart)
- * [Start](#start)
- * [Create Flows](#template)
- * [Manage Kafka](#kafka)
- * [Process Some Data](#process)
- * [Stop](#stop)
+* [Quickstart](#quickstart)
+* [Start](#start)
+* [Create Flows](#template)
+* [Manage Kafka](#kafka)
+* [Process Some Data](#process)
+* [Stop](#stop)
 * [Registry](#registry)
 * [Further Documents](#subdocs)
 

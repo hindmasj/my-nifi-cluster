@@ -14,6 +14,7 @@ See each article. Often each one relies on its predecessor.
 * [Unpacking Lookups](experiment-unpacking_lookups.md)
 * [Fork / Join Enrichment](experiment-fork_join_enrichment.md)
 * [Grok Filtering](experiment-grok_filtering.md)
+* [Running Redis Commands Directly](experiment-redis_direct.md)
 
 ---
 ### [Home (README.md)](../README.md)
