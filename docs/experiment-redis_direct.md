@@ -7,7 +7,7 @@ Being able to set and retrieve values from a single is ok, but sometimes you nee
 
 ## Preparation - Install Redis Tools
 
-You need to install the package *redis-tools*. The script ``bin/install-redis-tools.sh`` will do this for you.
+You need to install the package *redis-tools*. The script ``bin/install-redis-tools.sh`` will do this for you. Long term you would want to add this package to the image.
 
 ## Services
 
@@ -47,7 +47,7 @@ As previously described, you also need
 * Command Arguments = ``-a nifi_redis -h redis keys *``
 * Command Path = ``redis-cli``
 * Ignore STDIN = true
-* Argument Delimiter = <space>
+* Argument Delimiter = &lt;space&gt;
 
 ### Lookup Record
 
@@ -90,6 +90,21 @@ Running the lookup will not only retrieve the values but will convert the whole 
   "value" : "hello world"
 } ]
 ```
+
+## Getting Input From The Flowfile
+
+You can use the flow file to provide the Redis script, by making the following changes.
+
+### GenerateFlowFile
+
+* Custom Text = ``keys *``
+
+### ExecuteStreamCommand
+
+* Command Arguments = ``-a nifi_redis -h redis``
+* Ignore STDIN = false
+
+Then executing the command will give the same results.
 
 ---
 ### [Home](../README.md) | [Up](experiments.md) | [Prev (Grok Filtering)](experiment-grok_filtering.md)
