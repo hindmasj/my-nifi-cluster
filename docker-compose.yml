@@ -55,7 +55,8 @@ services:
     volumes:
       - ../flow_storage:/mnt/flow_storage:rw
   nifi:
-    image: apache/nifi:latest
+    #image: apache/nifi:latest
+    build: ./build-nifi
     depends_on:
       - zookeeper
       - registry
