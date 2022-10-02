@@ -3,22 +3,26 @@
 
 # Running Redis Commands Within NiFi
 
-Being able to set and retrieve values from a single is ok, but sometimes you need to get more out of Redis, like a list of keys that match a pattern. Here we get a list of all keys, then look them all up.
+Being able to set and retrieve values from a single key is ok, but sometimes you need to get more out of Redis, like a list of keys that match a pattern. Here we get a list of all keys, then look them all up.
 
 ## Preparation - Install Redis Tools
 
-You need to install the package *redis-tools*. The script ``bin/install-redis-tools.sh`` will do this for you. Long term you would want to add this package to the image.
+You need to install the package *redis-tools* to obtain the *redis-cli* application.
+
+In this cluster you can use the script ``bin/install-redis-tools.sh`` but in fact this package was added to the image.
 
 ## Services
 
 ### CSV Reader
+
+Use the CSV reader to parse the command response.
 
 * Schema Access Strategy = Use Schema Text Property
 * Schema Text = ${avro.schema}
 
 ### Others
 
-As previously described, you also need
+As [previously described](experiment-enrich_from_redis.md), you also need these services to perform a Redis lookup.
 
 * InheritJsonRecordSetWriter
 * RedisConnectionPoolService
@@ -43,6 +47,7 @@ As previously described, you also need
 ```
 
 ### ExecuteStreamCommand
+Execute the *redis-cli* command. The *ExecuteStreamCommand* processor behave just as if you were working on the command line.
 
 * Command Arguments = ``-a nifi_redis -h redis keys *``
 * Command Path = ``redis-cli``
@@ -79,7 +84,7 @@ bar
 
 ### Lookup Keys
 
-Running the lookup will not only retrieve the values but will convert the whole flow file into JSON.
+Running the Lookup will not only retrieve the values but will convert the whole flow file into JSON.
 
 ```
 [ {
@@ -101,10 +106,12 @@ You can use the flow file to provide the Redis script, by making the following c
 
 ### ExecuteStreamCommand
 
+Here the command uses the flowfile contents as STDIN.
+
 * Command Arguments = ``-a nifi_redis -h redis``
 * Ignore STDIN = false
 
-Then executing the command will give the same results.
+Then executing the command will give the same results as before. By using this method you could put any arbitrary script into the flowfile for processing.
 
 ---
 ### [Home](../README.md) | [Up](experiments.md) | [Prev (Grok Filtering)](experiment-grok_filtering.md)
