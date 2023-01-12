@@ -19,6 +19,12 @@
         <artifactId>nifi-processors</artifactId>
         <version>${revision}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.nifi</groupId>
+        <artifactId>nifi-framework-api</artifactId>
+        <version>${nifi.version}</version>
+        <scope>provided</scope>
+      </dependency>
     </dependencies>
 
 </project>
