@@ -9,7 +9,20 @@ Being able to set and retrieve values from a single key is ok, but sometimes you
 
 You need to install the package *redis-tools* to obtain the *redis-cli* application.
 
-In this cluster you can use the script ``bin/install-redis-tools.sh`` but in fact this package was added to the image.
+In this cluster you can use the script ``bin/install-redis-tools.sh`` but in fact this package was added to the image. In order to rebuild the image do the following.
+
+```
+docker pull apache/nifi
+docker compose build
+```
+
+You can register your copy of the image with the docker registry if you have a registry account. You can view your images from the Docker Desktop opening the "Images" menu and clicking the "Hub" tab.
+
+```
+docker login --username <username>
+docker image tag my-nifi-cluster-nifi:latest <username>/nifi
+docker push <username>/nifi
+```
 
 ## Services
 
