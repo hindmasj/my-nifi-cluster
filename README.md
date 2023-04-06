@@ -223,6 +223,10 @@ On NiFi you still need to create the registry client link as described above to 
 1. Select the bucket, flow and version you want.
 1. Click "Import".
 
+## Automatic
+
+This has been automated with the script ``bin/add-registry.sh```.
+
 # <a name="subdocs"></a>More
 
 To simplify the documentation, further sections have been moved to separate documents under the "docs" directory.

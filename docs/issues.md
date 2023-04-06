@@ -47,6 +47,8 @@ Use the [Apache](https://hub.docker.com/r/apache/nifi-registry) image. Tasks are
 
 This seems to be manual from the NiFi desktop. Note you cannot register processors or the whole system, only processor groups.
 
+This has been automated with the script ``bin/add-registry.sh```.
+
 ### Connect to Git
 
 There is a file called *providers.xml* in */opt/nifi-registry/nifi-registry-current/conf*. This has the settings for a Git provider commented out. Use the configs option to remount a local file.
