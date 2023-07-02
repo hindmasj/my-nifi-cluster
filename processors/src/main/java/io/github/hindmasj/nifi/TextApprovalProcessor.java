@@ -89,7 +89,7 @@ public class TextApprovalProcessor extends AbstractProcessor{
 
     } catch (Exception e) {
       getLogger().error("Unhandled exception: "+e.getMessage());
-      getLogger().debug("Stack Trace: ", e.getStackTrace());
+      getLogger().debug("Stack Trace: ", e.getStackTrace()[0]);
       session.transfer(flowFile, FAILURE);
     }
 
