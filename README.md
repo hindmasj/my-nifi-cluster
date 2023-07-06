@@ -242,7 +242,7 @@ On NiFi you still need to create the registry client link as described above to 
 
 ## Automatic
 
-This has been automated with the script ``bin/add-registry.sh```. You still need to run this command manually of course.
+This has been automated with the script ``bin/add-registry.sh``. You still need to run this command manually of course.
 
 # <a name="subdocs"></a>More
 
