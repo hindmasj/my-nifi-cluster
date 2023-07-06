@@ -12,6 +12,7 @@ Inspired by article [Running a cluster with Apache Nifi and Docker](https://www.
 * [Manage Kafka](#kafka)
 * [Process Some Data](#process)
 * [Stop](#stop)
+* [Running Specific Versions](#images)
 * [Registry](#registry)
 * [Further Documents](#subdocs)
 
@@ -192,6 +193,22 @@ As this is so useful you can launch it with ``bin/launch-script.sh consumer``.
 
 Simply ``docker compose down`` to stop the cluster and destroy the containers. If you want to preserve the containers then use ``docker compose stop``.
 
+# <a name="images"></a>Running Specific Versions Of NiFi
+
+The cluster uses a locally built image of NiFi based on the official NiFi image. This gives scope to add extra tools at the build stage instead of waiting until run time. At present this only involves installing the package *redis-tools* which is used in one of the [experiments](docs/experiment-redis_direct.md) where an ExecuteStreamCommand processor runs the tools in a shell to run ad hoc Redis commands.
+
+This image uses the build script in *build-nifi/Dockerfile* to perform this task, and is referred from *docker-compose.yml* so that the build is performed automatically for you.
+
+You can however rebuild this image manually any time you wish with ``docker compose build``.
+
+You can also override the "latest" tag within the build file to run a specific version of NiFi. For example:
+
+```
+docker compose build --build-arg NIFI_VERSION=1.16.0
+```
+
+The image is still tagged as latest so will be used the next time "up" is called.
+
 # <a name="registry"></a>Using the Registry
 
 A NiFi registry service has been added to make persistence of flows easier than having to use the template method.
@@ -225,7 +242,7 @@ On NiFi you still need to create the registry client link as described above to 
 
 ## Automatic
 
-This has been automated with the script ``bin/add-registry.sh```.
+This has been automated with the script ``bin/add-registry.sh```. You still need to run this command manually of course.
 
 # <a name="subdocs"></a>More
 
@@ -238,8 +255,9 @@ To simplify the documentation, further sections have been moved to separate docu
   * [Using Tab Separation](docs/experiment-tab_separation.md)
   * [Convert To ECS](docs/experiment-convert_to_ecs.md)
   * [Enrich From Redis](docs/experiment-enrich_from_redis.md)
-  * [Write To Redis](experiment-write_to_redis.md)
-  * [Some Specific Transform Cases](experiment-some_specific_transform_cases.md)
-  * [Unpacking Lookups](experiment-unpacking_lookups.md)
-  * [Fork / Join Enrichment](experiment-fork_join_enrichment.md)
-  * [Grok Filtering](experiment-grok_filtering.md)
+  * [Write To Redis](docs/experiment-write_to_redis.md)
+  * [Some Specific Transform Cases](docs/experiment-some_specific_transform_cases.md)
+  * [Unpacking Lookups](docs/experiment-unpacking_lookups.md)
+  * [Fork / Join Enrichment](docs/experiment-fork_join_enrichment.md)
+  * [Grok Filtering](docs/experiment-grok_filtering.md)
+  * [Running Redis Commands Within NiFi](docs/experiment-redis_direct.md)
