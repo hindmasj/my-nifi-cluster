@@ -74,6 +74,17 @@ services:
       - NIFI_ZK_CONNECT_STRING=zookeeper:2181
       - NIFI_ELECTION_MAX_WAIT=1 min
       - NIFI_SENSITIVE_PROPS_KEY=3e38a10eb5fb
+    volumes:
+      - nifi-logs:/opt/nifi/nifi-current/logs
+    configs:
+      - source: logback
+        target: /opt/nifi/nifi-current/conf/logback.xml
+
 configs:
   providers:
     file: ./providers.xml
+  logback:
+    file: ./logback.xml
+
+volumes:
+  nifi-logs:
