@@ -17,6 +17,10 @@ Once the service has launched, go to http://localhost:8080/. Then click on "NiFi
 
 The proxy works fine when the "elasticsearch" netwrok is not connected, but once it is the NiFi node gets confused as to which network it is on and makes reverse proxy requests to itself, but on the wrong network. Need to explore the "[external_links](https://docs.docker.com/compose/compose-file/compose-file-v3/#external_links)" feature instead.
 
+## External Link
+
+
+
 ## TODO - Connection
 
 See notes above, this will need to change.

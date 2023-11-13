@@ -96,7 +96,9 @@ services:
     networks:
       default:
         priority: 100
-      #elasticsearch:
+      elasticsearch:
+    external_links:
+        - elasticsearch:master
     environment:
       - NIFI_WEB_HTTP_PORT=8080
       - NIFI_CLUSTER_IS_NODE=true
