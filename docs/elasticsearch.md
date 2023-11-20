@@ -31,7 +31,7 @@ docker compose exec nifi curl -n --cacert es_ca.crt https://host.docker.internal
 
 ## Create Truststore
 
-To get the ES node to be trusted by NiFi, create a truststore from the CA file. This script copies the CA file from es01, builds it into a truststore with an empty password, then adds it to NiFi conf.
+To get the ES node to be trusted by NiFi, create a truststore from the CA file. This script copies the CA file from es01, builds it into a truststore with the password "elastic", then adds it to NiFi conf.
 
 ```
 bin/build-truststore.sh
@@ -43,14 +43,33 @@ Then create an SSL trust service.
 |-- |-- |
 | Type | StandardRestrictedSSLContextService |
 | Truststore Filename | conf/es_ca.pfx |
-| Truststore Password | Empty String |
+| Truststore Password | elastic |
 | Truststore Type | PKCS12 |
+
+## Make A Connection
+
+Create an Elasticsearch client implementation service.
+
+| Parameter | Value |
+|-- |-- |
+| Type | ElasticSearchClientServiceImpl |
+| HTTP Hosts | https://host.docker.internal:9200/ |
+| Username | elastic |
+| Password | elastic |
+| SSL Context Service | StandardRestrictedSSLContextService |
+
+Building a simple flow to use this service I get
+
+```
+java.io.IOException: java.security.InvalidAlgorithmParameterException: the trustAnchors parameter must be non-empty
+```
+
 
 ## TODO
 
-* Create a trust store for the NiFI nodes.
+* Create a trust store for the NiFI nodes. DONE!
 * Create an API key for NiFi.
-* Create some put and lookup services and flows.
+* Create some put and lookup services and flows. In Progress!
 
 ---
 ### [Home (README.md)](../README.md)
