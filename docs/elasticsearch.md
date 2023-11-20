@@ -29,6 +29,23 @@ docker compose cp ../my-elasticsearch-cluster/http_ca.crt nifi:/opt/nifi/nifi-cu
 docker compose exec nifi curl -n --cacert es_ca.crt https://host.docker.internal:9200/_cat/nodes
 ```
 
+## Create Truststore
+
+To get the ES node to be trusted by NiFi, create a truststore from the CA file. This script copies the CA file from es01, builds it into a truststore with an empty password, then adds it to NiFi conf.
+
+```
+bin/build-truststore.sh
+```
+
+Then create an SSL trust service.
+
+| Parameter | Value |
+|-- |-- |
+| Type | StandardRestrictedSSLContextService |
+| Truststore Filename | conf/es_ca.pfx |
+| Truststore Password | Empty String |
+| Truststore Type | PKCS12 |
+
 ## TODO
 
 * Create a trust store for the NiFI nodes.
