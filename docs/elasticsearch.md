@@ -37,25 +37,25 @@ To get the ES node to be trusted by NiFi, create a truststore from the CA file. 
 bin/build-truststore.sh
 ```
 
-Then create an SSL trust service.
+Then create an SSL trust service. Note that the PKS type of truststore does not work. I suspect it is related to the version of Java used. Use the JKS type instead. Both are created by the script.
 
-| Parameter | Value |
-|-- |-- |
-| Type | StandardRestrictedSSLContextService |
-| Truststore Filename | conf/es_ca.pfx |
-| Truststore Password | elastic |
-| Truststore Type | PKCS12 |
+| Parameter           | Value                               |
+|---------------------|-------------------------------------|
+| Type                | StandardRestrictedSSLContextService |
+| Truststore Filename | conf/es_ca.jks                      |
+| Truststore Password | elastic                             |
+| Truststore Type     | JKS                                 |
 
 ## Make A Connection
 
 Create an Elasticsearch client implementation service.
 
-| Parameter | Value |
-|-- |-- |
-| Type | ElasticSearchClientServiceImpl |
-| HTTP Hosts | https://host.docker.internal:9200/ |
-| Username | elastic |
-| Password | elastic |
+| Parameter           | Value                               |
+|---------------------|-------------------------------------|
+| Type                | ElasticSearchClientServiceImpl      |
+| HTTP Hosts          | https://host.docker.internal:9200/  |
+| Username            | elastic                             |
+| Password            | elastic                             |
 | SSL Context Service | StandardRestrictedSSLContextService |
 
 Building a simple flow to use this service I get
