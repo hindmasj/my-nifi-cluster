@@ -1,0 +1,38 @@
+Title: MapRecord[] in Lookup results from Elasticsearch
+
+MapRecord[] seems to be the theme of the day.
+
+I am looking at replacing our existing Redis enrichment solution with one based on Elasticsearch. One key advantage is that the response from ES is a JSON object, insted of a string as with our current Redis solution. So the lookup result does not require further parsing before can be built into the record. I have however encountered one possible bug.
+
+The use case I have is where I want to lookup an enrichment record based on the fields in the existing record, but I do not know which of a fixed selection of fields will have a usable match in each case, so I have to try each one in turn until I get a match. I have boiled this problem down to the essentials with a trivial example. I have created an index with the following entries, where the key value is also used as the document ID.
+
+[
+ {"key":"one","value":1},
+ {"key":"two","value":2},
+ {"key":"three","value":3},
+ {"key":"four","value":4}
+]
+
+And a test file with the following content.
+
+[
+ {"name":"bob","role":"user","hands":"two","Enrichment":{}},
+ {"name":"bill","role":"dog","legs":"four","Enrichment":{}}
+]
+
+My flow consists of 2 LookupRecord processors using a single ElasticsearchLookupService which points back to my test index. There are no schemas defined and I use JSON readers and writers with the "infer" and "inherit" schema strategies.
+
+The first lookup uses the Result RecordPath of "/Enrichment/limbs" and single lookup parameter of "key" : "/hands". The second lookup uses the same result path but the lookup parameter is "key" : "/legs". Both processors route to matched or unmatched. The test file is given to the first lookup. The unmatched relationship goes to the second lookup.
+
+On the matched side of the first processor I get the expected result that Bob has 2 limbs.
+
+[{"name":"bob","role":"user","hands":"two","Enrichment":{"limbs":{"key":"two","value":2}},"legs":null}]
+
+But on the matched side of the second the lookup value is encoded as a MapRecord array string, requiring further parsing, which removes an advantage of using ES.
+
+[{"name":"bill","role":"dog","hands":null,"Enrichment":{"limbs":"MapRecord[{key=four, value=4}]"},"legs":"four"}]
+
+This result is position dependant. Reversing the order of the lookups sees Bill being correctly enriched but Bob gets a MapRecord string. Changing the result record path of the second lookup (eg to "/Enrichment/limbs2") makes the problem go away, so I might be able to use this as a workaround, but it will involve coalescing the results further down the line.
+
+Is this a bug or have I missed something out.
+
