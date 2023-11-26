@@ -37,7 +37,7 @@ To get the ES node to be trusted by NiFi, create a truststore from the CA file. 
 bin/build-truststore.sh
 ```
 
-Then create an SSL trust service. Note that the PKS type of truststore does not work. I suspect it is related to the version of Java used. Use the JKS type instead. Both are created by the script.
+Then create an SSL trust service. Both JKS and PFX type truststores are created by the script so you can use either.
 
 | Parameter           | Value                               |
 |---------------------|-------------------------------------|
@@ -45,6 +45,22 @@ Then create an SSL trust service. Note that the PKS type of truststore does not 
 | Truststore Filename | conf/es_ca.jks                      |
 | Truststore Password | elastic                             |
 | Truststore Type     | JKS                                 |
+
+### Truststore Creation Issue
+
+One issue found is that you need to use Java keystore to create the stores, as openssl does add the required tag to the certificate to indicate it is trusted. Examining the trustore shows this difference.
+
+```
+$ diff es_ca.txt-keystore es_ca.txt-openssl
+1,3c1
+< Bag Attributes
+<     friendlyName: ca
+<     2.16.840.1.113894.746875.1.1: <Unsupported tag 6>
+    ---
+    > Bag Attributes: <No Attributes>
+```
+
+Research continues.
 
 ## Make A Connection
 

@@ -10,11 +10,10 @@ ES_CA_PATH=${ES_HOME}/config/certs/ca/ca.crt
 
 docker compose -p ${ES_CLUSTER} cp ${ES_NODE}:${ES_CA_PATH} es_ca.crt
 
-openssl pkcs12 -export -nokeys -name ca -in es_ca.crt -out es_ca.pfx -password pass:elastic
+#openssl pkcs12 -export -nokeys -name ca -in es_ca.crt -out es_ca.pfx-openssl -password pass:elastic
+keytool -keystore es_ca.pfx -storepass elastic -storetype pkcs12 -alias ca -import -file es_ca.crt -trustcacerts -noprompt
 docker compose cp es_ca.pfx nifi:${NIFI_CONF}
 
 rm -f es_ca.jks
 keytool -keystore es_ca.jks -storepass elastic -storetype jks -alias ca -import -file es_ca.crt -trustcacerts -noprompt
 docker compose cp es_ca.jks nifi:${NIFI_CONF}
-
-
