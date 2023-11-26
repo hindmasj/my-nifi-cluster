@@ -60,7 +60,7 @@ $ diff es_ca.txt-keystore es_ca.txt-openssl
     > Bag Attributes: <No Attributes>
 ```
 
-Research continues.
+Research continues. A reading of https://github.com/openssl/openssl/pull/19025 suggest a feature to support this will be available in Openssl 3.2. I am currently on 3.0.9.
 
 ## Make A Connection
 
