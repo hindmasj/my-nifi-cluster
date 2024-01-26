@@ -42,17 +42,19 @@ Once the service has launched, go to http://localhost:8080/. Then click on "NiFi
 
 ### Connect Via Docker Host
 
-The proxy works fine when the "elasticsearch" network is not connected, but once it is the NiFi node gets confused as to which network it is on and makes reverse proxy requests to itself, but on the wrong network. Need to explore the "[external_links](https://docs.docker.com/compose/compose-file/compose-file-v3/#external_links)" feature instead. So I have abandoned to idea of using a connection over the elasticsearch network and instead will use the host maching to make the connection.
+The proxy works fine when the "elasticsearch" network is not connected, but once it is the NiFi node gets confused as to which network it is on and makes reverse proxy requests to itself, but on the wrong network. Also had a look at the "[external_links](https://docs.docker.com/compose/compose-file/compose-file-v3/#external_links)" feature instead. I have abandoned to idea of using a connection over the elasticsearch network and instead will use the host machine to make the connection.
 
 This is now documented in the elasticsearch project, and involved using a docker compose file specifically for a multi-node elasticsearch cluster, and building the host alias as a SAN into the primary node's certificate.
 
-The quick test of this then is as follows.
+The quick command line test of this then is as follows.
 
 ```
 docker compose cp ../my-elasticsearch-cluster/netrc nifi:/home/nifi/.netrc
 docker compose cp ../my-elasticsearch-cluster/http_ca.crt nifi:/opt/nifi/nifi-current/es_ca.crt
 docker compose exec nifi curl -n --cacert es_ca.crt https://host.docker.internal:9200/_cat/nodes
 ```
+
+The script ``bin/connect-elasticsearch.sh`` now performs the required copying and setting up of the certificate data.
 
 ### Create Truststore
 
@@ -61,7 +63,7 @@ To get the ES node to be trusted by NiFi, create a truststore from the CA file. 
 ```
 bin/build-truststore.sh
 ```
-### Truststore Creation Issue
+#### Truststore Creation Issue
 
 The first attempt at doing this with ``openssl`` to create a PKCS style truststore resulted in the following error.
 
@@ -87,7 +89,7 @@ So instead the script builds a truststore based on JKS using Java ``keytool``.
 
 ## <a name="build_flow"></a>Build An Elasticsearch Flow
 
-This section describes the basic of adding an Elasticsearch connection to your flow. You will need a minimum of JSON readers and writers defined and some JSON data to play with.
+This section describes the basics of adding an Elasticsearch connection to your flow. You will need a minimum of JSON readers and writers defined and some JSON data to play with.
 
 ### Set Up Parameters
 
@@ -118,7 +120,7 @@ Create an Elasticsearch client implementation service.
 
 ### Put Data
 
-To put data you just need a "PutElasticsearchRecord" processor. If you already have an index and templat already defined then so much the better.
+To put data you just need a "PutElasticsearchRecord" processor. If you have an index and/or template already defined then so much the better.
 
 | Parameter                 | Value                                           |
 |---------------------------|-------------------------------------------------|
