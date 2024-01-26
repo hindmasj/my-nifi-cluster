@@ -18,7 +18,7 @@ Inspired by article [Running a cluster with Apache Nifi and Docker](https://www.
 
 # <a name="installation"></a>Installation
 
-Before starting you will need to create a new git repo to store the flows in. It is not a good idea to use this repo.
+Before starting you will need to create a new git repo to store the flows in. It is not a good idea to use this cluster repo, the work needs to go in its own repo.
 
 ```
 git init ../flow_storage
@@ -31,9 +31,9 @@ sudo chown -R 1000.1000 ../flow_storage
 
 1. Start the cluster ``docker compose up -d``.
 1. Create some topics ``bin/launch-script.sh``.
-1. Get the cluster URL ``bin/get-nifi-url.sh``.
-1. Post the URL in your browser.
+1. Open the cluster URL in your browser: [Localhost Port 8080](http://localhost:8080/).
 1. Build some flows, process some data.
+1. If you have already built the [registry](#registry) then link the cluster to it ``bin/add-registry.sh``.
 
 You might need to wait a minute from starting the cluster to using the URL, as it takes some time for all of the NiFi nodes to form a cluster.
 
