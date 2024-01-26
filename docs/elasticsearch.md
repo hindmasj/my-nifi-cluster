@@ -155,7 +155,48 @@ This defines a processor which, given a search key, will lookup the record with 
 | Class              | LookupRecord                   |
 | Lookup Service     | ElasticSearchLookupService     |
 | Result Record Path | &lt;record path for result&gt; |
-| key                | &lt;record path for key&gt;    |
+| &lt;key&gt;        | &lt;record path for key&gt;    |
+
+The key is a dynamic parameter and can be any field that exists in your stored data. If you use the key name "_id" then you are selecting from the unique document ID from the index. If you use this then you can only define one key. Otherwise you can set multiple keys to refine the lookup search.
+
+### Example Data Flow
+
+Take this example data set.
+
+```
+[
+ {"key":"one","value":1},
+ {"key":"two","value":2},
+ {"key":"three","value":3},
+ {"key":"four","value":4}
+]
+```
+
+Put it into an index by using the above *put* processor.
+
+Now take this data set which we want to enrich.
+
+```
+[
+ {"name":"bob","role":"user","hands":"two","legs":"two","Enrichment":{}},
+ {"name":"brad","role":"orang-utan","hands":"four","legs":"two","Enrichment":{}},
+ {"name":"bill","role":"dog","legs":"four","Enrichment":{}}
+]
+```
+
+Note the empty map "Enrichment" already exists.
+
+Set up a lookup record processor with "Result Record Path"="/Enrichment/limbs". Create a the single dynamic parameter "key"="/hands". Then when you run the lookup you will enrich the records that has a "hands" field, with the details from the stored document with a key of "two".
+
+```
+[
+ {"name":"bob","role":"user","hands":"two","legs":"two","Enrichment":{"limbs":{"key":"two","value":2}}},
+ {"name":"brad","role":"orang-utan","hands":"four","legs":"two","Enrichment":{"limbs":{"key":"four","value":4}}},
+ {"name":"bill","role":"dog","hands":null,"legs":"four","Enrichment":{"limbs":null}}
+]
+```
+
+So a silly example, but you can what it is doing.
 
 ## TODO
 
