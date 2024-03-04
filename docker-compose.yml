@@ -67,6 +67,7 @@ services:
     ports:
       - 8080 # Unsecured HTTP Web Port
       - 8083 # Unsecured listening port
+      - 9092 # Unsecured metrics port
     environment:
       - NIFI_WEB_HTTP_PORT=8080
       - NIFI_CLUSTER_IS_NODE=true
@@ -74,6 +75,28 @@ services:
       - NIFI_ZK_CONNECT_STRING=zookeeper:2181
       - NIFI_ELECTION_MAX_WAIT=1 min
       - NIFI_SENSITIVE_PROPS_KEY=3e38a10eb5fb
+  influxdb:
+    hostname: influxdb
+    container_name: influxdb
+    image: influxdb:latest
+    profiles:
+      - donotstart
+    ports:
+      - 8086:8086
+    volumes:
+      - ~/volumes/influx:/var/lib/influxdb2:rw
+    env_file:
+      - influxv2.env
+  telegraf:
+    hostname: telegraf
+    container_name: telegraf
+    image: telegraf:latest
+    profiles:
+      - donotstart
+    volumes:
+      - ~/volumes/telegraf:/etc/telegraf
+    env_file:
+      - influxv2.env
 configs:
   providers:
     file: ./providers.xml

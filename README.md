@@ -251,6 +251,7 @@ To simplify the documentation, further sections have been moved to separate docu
 * [Custom Processors](docs/custom_processors.md)
 * [Issues](docs/issues.md)
 * [Working With Elasticsearch](docs/elasticsearch.md)
+* [Working With InfluxDB](docs/influx.md)
 * [Experiments](docs/experiments.md)
   * [Standard Processors](docs/experiment-standard_processors.md)
   * [Using Tab Separation](docs/experiment-tab_separation.md)
