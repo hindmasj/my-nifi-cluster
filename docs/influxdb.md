@@ -47,6 +47,8 @@ You can now view data for the NiFi cluster in your new bucket inside InfluxDB by
 
 * The initial value of the API token did not seem to match what was in the Env file. As a workaround I created a real token and copied it into the Env file before I started the Telegraf container. Will need to retest this.
 * I should really put the Telegraf file under version control and access it from inside the working directory, not via a local volume.
+* Document a worked example of creating a NiFi query.
+* The bucket name should be NiFi specific.
 
 ---
 ### [Home (README.md)](../README.md)
