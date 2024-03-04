@@ -41,7 +41,7 @@ The configuration includes an output section, which defines the database and buc
 2. Start the Telegraf service instance. ``docker compose up telegraf -d``
 3. Check the logs for the Telegraf service in Docker Desktop to ensure that there are no errors.
 
-You can now view data for in your new bucket inside InfluxDB by using the GUI.
+You can now view data for the NiFi cluster in your new bucket inside InfluxDB by using the GUI.
 
 ## Issues And Next Steps
 
