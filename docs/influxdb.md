@@ -15,35 +15,37 @@ I am being guided by the steps at [Running InfluxDB 2.0 and Telegraf Using Docke
 4. Change "Send JVM Metrics" to "true".
 5. Start the task.
 
-## Create Influx Startup Environment
+## Create InfluxDB and Telegraf Services
 
-A simple environment file called **influxv2.env** is created which creates a default user, API token, organisation and bucket. The environment file is then shared between the InfluxDB and Telegraf containers so that they can communicate.
+### Create Influx Startup Environment
 
-## Add InfluxDB Instance To Cluster
+A simple environment file called **influxv2.env** has been created in the repo which creates a default user, API token, organisation and bucket. The environment file is then shared between the InfluxDB and Telegraf containers so that they can communicate.
+
+### Add InfluxDB Instance To Cluster
 
 1. Pick a local directory for persistent storage. In this case I will pick a directory in my home directory. ``mkdir -p ~/volumes/influx``
-2. Add an InfluxDB service to *docker-compose.yml*.
+2. Add an InfluxDB service to *docker-compose.yml*. This has already been done.
 3. Start the InfluxDB service instance. ``docker compose up influxdb -d``
 4. Connect to the [InfluxDB GUI](http://localhost:8086) and sign in with "admin/admin123".
 
-## Create The Prometheus Configuration
+### Create The Prometheus Configuration
 
 1. Create a directory for Telegraf's persistent storage. ``mkdir -p ~/volumes/telegraf``
-2. Create the file *~/volumes/telegraf/telegraf.conf*. Use the file *telegraf.conf* supplied in this repo.
+2. Create the file *~/volumes/telegraf/telegraf.conf*. Use the file **telegraf.conf** supplied in this repo. ``cp telegraf.conf ~/volumes/telegraf``
 
 The configuration includes an output section, which defines the database and bucket to store the metrics, and an input section which points to the Prometheus end point being run by NiFi.
 
-## Create The Telegraf Service
+### Create The Telegraf Service
 
-1. Add a Telegraf service to *docker-compose.yml*.
+1. Add a Telegraf service to *docker-compose.yml*. This has already been done.
 2. Start the Telegraf service instance. ``docker compose up telegraf -d``
 3. Check the logs for the Telegraf service in Docker Desktop to ensure that there are no errors.
 
 You can now view data for in your new bucket inside InfluxDB by using the GUI.
 
-## Issues And Next
+## Issues And Next Steps
 
-* The initial value of the API token did not seem to match what was in the Env file. As a workaround I created a real token and copied it into the Env file before I started the Telegraf container.
+* The initial value of the API token did not seem to match what was in the Env file. As a workaround I created a real token and copied it into the Env file before I started the Telegraf container. Will need to retest this.
 * I should really put the Telegraf file under version control and access it from inside the working directory, not via a local volume.
 
 ---
