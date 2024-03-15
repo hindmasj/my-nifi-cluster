@@ -15,12 +15,32 @@
 
 version: "3.8"
 services:
+  nginx:
+    hostname: nginx
+    container_name: nginx
+    image: nginx
+    depends_on:
+      - registry
+      - nifi
+    ports:
+      - "8080:8080"
+      - "80:80"
+      - "8443:443"
+    networks:
+      - default
+    configs:
+      - source: proxy
+        target: /etc/nginx/conf.d/proxy.conf
+      - source: index
+        target: /usr/share/nginx/html/proxy.htm
   zookeeper:
     hostname: zookeeper
     container_name: zookeeper
     image: 'bitnami/zookeeper:latest'
     ports:
       - 2181
+    networks:
+      - default
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
   redis:
@@ -29,6 +49,8 @@ services:
     image: bitnami/redis:latest
     ports:
       - 6379
+    networks:
+      - default
     environment:
       - REDIS_PASSWORD=nifi_redis
   kafka:
@@ -40,6 +62,8 @@ services:
       replicas: 3
     ports:
       - 9092
+    networks:
+      - default
     environment:
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
@@ -48,7 +72,9 @@ services:
     container_name: registry
     image: apache/nifi-registry:latest
     ports:
-      - "18080:18080"
+      - "18080"
+    networks:
+      - default
     configs:
       - source: providers
         target: /opt/nifi-registry/nifi-registry-current/conf/providers.xml
@@ -64,7 +90,7 @@ services:
       mode: replicated
       replicas: 3
       endpoint_mode: vip
-    ports:
+    expose:
       - 8080 # Unsecured HTTP Web Port
       - 8083 # Unsecured listening port
       - 9092 # Unsecured metrics port
@@ -99,4 +125,8 @@ services:
       - influxv2.env
 configs:
   providers:
-    file: ./providers.xml
+    file: ./conf/providers.xml
+  proxy:
+    file: ./conf/proxy.conf
+  index:
+    file: ./conf/nginx-index.htm
