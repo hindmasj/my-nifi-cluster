@@ -44,18 +44,10 @@ See how to load flows from a [template](#template) or from the [NiFi registry](#
 To start the cluster up and connect to the NiFi desktop.
 
 1. Start the cluster with ``docker compose up -d``. The cluster will start 3 NiFi nodes to hold a proper election for master.
-1. Run ``bin/get-nifi-url.sh`` and note the URL that is returned. It will be something like *http\://localhost:\<port\>/nifi*.
-1. Copy and paste that URL into your browser to connect to the NiFi desktop. On WSL you only need to hover over the URL and then *ctrl-click*.
-
-What the "get" script does is run ``docker compose port nifi 8080`` to get one of the port mappings for the NiFi service, then extracts the port part to create a URL.
-
-```
-$ docker compose port nifi 8080
-0.0.0.0:62142
-
-$ bin/get-nifi-url.sh
-http://localhost:62142/nifi
-```
+1. Connect to the Nginx proxy at [Localhost Port 8080](http://localhost:8080/).
+1. The server present a simple menu that will take you to the NiFi cluster or to the register.
+1. Select "NiFi Cluster". The nodes take a while to start running so at first you will get the bad proxy error. Keep trying.
+1. Afterwards, you can go directly to http://localhost:8080/nifi/.
 
 ## <a name="template"></a>Create Flows
 
