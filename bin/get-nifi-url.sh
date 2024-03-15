@@ -8,6 +8,6 @@ SERVICE=nifi
 #port=$(docker compose ps | \
 #  awk '/'${PREFIX}-${SERVICE}-1'/ {print gensub(".*:([[:digit:]]+)->.*","\\1","g",$5)}')
 
-port=$(docker compose port ${SERVICE} ${PORT} | cut -d: -f2)
+# port=$(docker compose port ${SERVICE} ${PORT} | cut -d: -f2)
 
-echo "http://localhost:${port}/nifi"
+echo "http://localhost:${PORT}/nifi"
