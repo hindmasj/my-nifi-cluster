@@ -44,7 +44,7 @@ See how to load flows from a [template](#template) or from the [NiFi registry](#
 To start the cluster up and connect to the NiFi desktop.
 
 1. Start the cluster with ``docker compose up -d``. The cluster will start 3 NiFi nodes to hold a proper election for master.
-1. Connect to the Nginx proxy at [Localhost Port 8080](http://localhost:8080/).
+1. Connect to the Nginx proxy at [Localhost Port 80](http://localhost:80/).
 1. The server present a simple menu that will take you to the NiFi cluster or to the register.
 1. Select "NiFi Cluster". The nodes take a while to start running so at first you will get the bad proxy error. Keep trying.
 1. Afterwards, you can go directly to http://localhost:8080/nifi/.
