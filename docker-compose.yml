@@ -32,7 +32,7 @@ services:
       - source: proxy
         target: /etc/nginx/conf.d/proxy.conf
       - source: index
-        target: /usr/share/nginx/html/proxy.htm
+        target: /usr/share/nginx/html/index.html
   zookeeper:
     hostname: zookeeper
     container_name: zookeeper
