@@ -1,6 +1,6 @@
 # Windows Event Parsing Issues
 
-Grabbing some notes for now.
+Exploring some issues with parsing Windows events and raising issues.
 
 ## EVTX Event Parser
 
@@ -219,7 +219,7 @@ which will parse out to
 
 Raised as [NIFI-13334](https://issues.apache.org/jira/browse/NIFI-13334).
 
-If the length of the second array is only then the first array loses all but its first element.
+If the length of the second array is only 1 then the first array loses all but its first element.
 
 This
 ```
@@ -270,7 +270,6 @@ parses to
   }
 } ]
 ```
-
 Notice that the first event now only has one data field, and it is no longer in an array. The same result is seen if the first event is the one with only one data tag.
 
 ### Dropping Data Values With Mixed Types
