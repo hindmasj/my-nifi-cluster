@@ -20,6 +20,12 @@ Look at [Docker On WSL](https://docs.docker.com/desktop/windows/wsl/#enabling-do
 docker-compose pull
 ```
 
+If build (below) is not pulling the version of the NiFi image you want, do it manually.
+
+```
+docker pull apache/nifi
+```
+
 ### Build Custom Image
 
 ```
